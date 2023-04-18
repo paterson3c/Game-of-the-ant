@@ -1,0 +1,35 @@
+#s:11|Entry|{       }| {     } |  {   }  |  {   }  |
+#s:121|CorridorONE|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:122|CorridorTWO|i _ _ _ i|i _ _ _ _|i _ _ _ _|i _ _ _ i|
+#s:123|CorridorTHREE|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:124|CorridorFOUR|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:125|CorridorFIVE|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:126|CorridorSIX|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:127|CorridorSEVEN|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:14|Hole|i  ___  \|  (   ) i|  (___) i|i       /|Hole|
+#s:13|Pantry|i _ _ _ i|i  ___  i|i [   ] i|\ [___] /|Pantry|
+#o:21|Grano|11|Grano_de_arroz|
+#o:22|Semilla|11|Semilla_de_pera|
+#o:23|Abeja|11|Abeja_común|
+#o:24|Piedra|11|Piedra_con_restos_de_hierro|
+#p:01|ant|11|5|3|
+#e:41|UAM|123|5|
+#l:31|Entry|11|121|2|1|-1|
+#l:321|Corridor1-N|121|11|1|1|-1|
+#l:322|Corridor1-S|121|122|2|1|-1|
+#l:331|Corridor2-N|122|121|1|1|-1|
+#l:332|Corridor2-S|122|123|2|1|-1|
+#l:333|Corridor2-E|122|125|3|1|-1|
+#l:351|Corridor3-N|123|122|1|1|-1|
+#l:352|Corridor3-S|123|124|2|0|41|
+#l:361|Corridor4-N|124|123|1|1|-1|
+#l:362|Corridor4-S|124|13|2|1|-1|
+#l:373|Corridor5-E|125|126|3|1|-1|
+#l:374|Corridor5-W|125|122|4|1|-1|
+#l:383|Corridor6-E|126|127|3|1|-1|
+#l:384|Corridor6-W|126|125|4|1|-1|
+#l:393|Corridor7-E|127|14|3|1|-1|
+#l:394|Corridor7-W|127|126|4|1|-1|
+#l:342|Hole-S|14|13|2|1|-1|
+#l:343|Hole-W|14|127|4|1|-1|
+#l:33|Pantry|13|124|1|1|-1|
