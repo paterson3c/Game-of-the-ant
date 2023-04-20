@@ -76,4 +76,23 @@ const char* object_get_desc(Object* object);
   */
 STATUS object_print(Object* object);
 
+/**
+ * @brief It gets the consumable status of an object
+ * 
+ * 
+ * @param object a pointer to the object
+ * @return TRUE if the object is consumable, FALSE if it is not
+ */
+BOOL object_getIfConsumable(Object* object);
+
+/**
+ * @brief It sets the consumable status of an object
+ * 
+ * 
+ * @param object a pointer to the object
+ * @param consumable TRUE if the object is consumable, FALSE if it is not
+ * @return OK if everything goes well, ERROR if there was some mistake
+*/
+STATUS object_setIfConsumable(Object* object, BOOL consumable);
+
 #endif

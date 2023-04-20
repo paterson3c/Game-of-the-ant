@@ -13,6 +13,7 @@ struct _Object
     Id id;                    /*!< Id number of the object, it must be unique */
     char name[WORD_SIZE + 1]; /*!< Name of the object */
     char description[235]; /*!< Description of the object */
+    BOOL consumable; /*!< If the object is consumable or not */
 };
 
 /**
@@ -171,5 +172,39 @@ STATUS object_print(Object *object)
     /* Print the id and the name of the object */
     fprintf(stdout, "--> Object (Id: %ld; Name: %s\n", object->id, object->name);
 
+    return OK;
+}
+
+/**
+ * @brief It gets the consumable attribute of an object
+ * @param object a pointer to the object
+ * 
+ * 
+ * @return TRUE if the object is consumable, FALSE if it is not
+*/
+BOOL object_getIfConsumable(Object *object)
+{
+    if (!object)
+    {
+        return FALSE;
+    }
+    return object->consumable;
+}
+
+/**
+ * @brief It sets the consumable attribute of an object
+ * 
+ * @param object a pointer to the object
+ * @param consumable a boolean that indicates if the object is consumable or not
+ * 
+ * @return OK if everything goes well, ERROR if there was some mistake
+*/
+STATUS object_setIfConsumable(Object *object, BOOL consumable)
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    object->consumable = consumable;
     return OK;
 }
