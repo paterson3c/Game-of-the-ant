@@ -17,12 +17,12 @@
 #include "types.h"
 
 #define ROWS 50
-#define COLUMNS 100
+#define COLUMNS 185
 #define MAX_STR 1024
 
 struct _Graphic_engine
 {
-  Area *map_north, *map_west, *map_act, *map_east, *map_south, *descript, *banner, *help, *feedback;
+  Area *map, *minmap, *descript, *inventory, *worklist, *dialogue;
 };
 
 Graphic_engine *graphic_engine_create()
@@ -41,15 +41,12 @@ Graphic_engine *graphic_engine_create()
     return NULL;
   }
 
-  ge->map_north = screen_area_init(1, 1, 68, 14);
-  ge->map_west = screen_area_init(1, 12, 24, 11);
-  ge->map_act = screen_area_init(25, 12, 29, 12);
-  ge->map_east = screen_area_init(45, 12, 24, 11);
-  ge->map_south = screen_area_init(1, 21, 68, 11);
-  ge->descript = screen_area_init(70, 1, 29, 31);
-  ge->banner = screen_area_init(39, 33, 23, 1);
-  ge->help = screen_area_init(1, 34, 97, 3);
-  ge->feedback = screen_area_init(1, 37, 97, 12);
+  ge->map = screen_area_init(50, 1, 100, 30);
+  ge->minmap = screen_area_init(151, 1, 30, 15);
+  ge->inventory = screen_area_init(70, 32, 60, 3);
+  ge->descript = screen_area_init(1, 1, 48, 30);
+  ge->worklist = screen_area_init(151, 17, 30, 14);
+  ge->dialogue = screen_area_init(1, 38, 181, 10);
 
   return ge;
 }
@@ -59,15 +56,13 @@ void graphic_engine_destroy(Graphic_engine *ge)
   if (!ge)
     return;
 
-  screen_area_destroy(ge->map_north);
-  screen_area_destroy(ge->map_east);
-  screen_area_destroy(ge->map_act);
-  screen_area_destroy(ge->map_west);
-  screen_area_destroy(ge->map_south);
+  screen_area_destroy(ge->map);
+  screen_area_destroy(ge->minmap);
+  screen_area_destroy(ge->inventory);
   screen_area_destroy(ge->descript);
-  screen_area_destroy(ge->banner);
-  screen_area_destroy(ge->help);
-  screen_area_destroy(ge->feedback);
+  screen_area_destroy(ge->worklist);
+  screen_area_destroy(ge->dialogue);
+
 
   screen_destroy();
   free(ge);
@@ -89,11 +84,7 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
   extern char *cmd_to_str[N_CMD][N_CMDT];
 
   /* Paint the in the map area */
-  screen_area_clear(ge->map_north);
-  screen_area_clear(ge->map_west);
-  screen_area_clear(ge->map_act);
-  screen_area_clear(ge->map_east);
-  screen_area_clear(ge->map_south);
+  screen_area_clear(ge->map);
 
   if ((id_act = game_get_player_location(game)) != NO_ID)
   {
@@ -112,6 +103,7 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
     space_south = game_get_space(game, id_south);
 
     /*Gets space descrpition*/
+    /*
     for (i = 0; i < (GDESC - 1); i++)
     {
       gdesc_north[i] = space_get_gdesc(space_north, i);
@@ -122,6 +114,7 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
     }
 
     /*Initialize objects*/
+    /*
     obj_north[0] = '\0';
     obj_west[0] = '\0';
     obj_act[0] = '\0';
@@ -130,6 +123,7 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
     aux[0] = '\0';
 
     /*Prints the objects of each space*/
+    /*
     id = space_get_objects(space_north);
     if (id != NULL)
     {
@@ -206,10 +200,11 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
     }
 
     i = 0;
+    */
 
     /*Paints north space*/
     /***************************************************************************************************/
-
+    /*
     if (enemy_getLocation(game->enemy[0]) == id_north)
       strcpy(enemy, "UAM");
     else
@@ -243,10 +238,10 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
       screen_area_puts(ge->map_north, str);
       i = 0;
     }
-
+    */
     /*Paints west space*/
     /***************************************************************************************************/
-
+    /*
     if (enemy_getLocation(game->enemy[0]) == id_west)
       strcpy(enemy, "UAM");
     else
@@ -277,10 +272,10 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
       i = 0;
     }
 
-
+    */
     /*Paints actual space*/
     /***************************************************************************************************/
-
+    /*
     if (enemy_getLocation(game->enemy[0]) == id_act)
       strcpy(enemy, "UAM");
     else
@@ -310,10 +305,10 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
       screen_area_puts(ge->map_act, str);
       i = 0;
     }
-
+    */
     /*Paints east space*/
     /***************************************************************************************************/
-
+    /*
     if (enemy_getLocation(game->enemy[0]) == id_east)
       strcpy(enemy, "UAM");
     else
@@ -343,10 +338,10 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
       screen_area_puts(ge->map_east, str);
       i = 0;
     }
-
+    */
     /*Paints south space*/
     /***************************************************************************************************/
-
+    /*
     if (enemy_getLocation(game->enemy[0]) == id_south)
       strcpy(enemy, "UAM");
     else
@@ -378,7 +373,7 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
       screen_area_puts(ge->map_south, str);
       i = 0;
     }
-
+    */
     /* Paint in the description area */
     /***************************************************************************************************/
 
@@ -432,19 +427,8 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
       screen_area_puts(ge->descript, str);
     }
 
-    /* Paint in the banner area */
-    screen_area_puts(ge->banner, "    The anthill game ");
-
-    /* Paint in the help area */
-    screen_area_clear(ge->help);
-    sprintf(str, " The commands you can use are:");
-    screen_area_puts(ge->help, str);
-    sprintf(str, "     next or n, back or b, right or r, left or l, exit or e, take or t, drop or d, attack or a,");
-    screen_area_puts(ge->help, str);
-    sprintf(str, "     inspect or i");
-    screen_area_puts(ge->help, str);
-
     /* Paint in the feedback area */
+    /*
     last_cmd = game_get_last_command(game);
     if (game->cmd_st == ERROR)
     {
@@ -457,6 +441,7 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
 
     sprintf(str, " %s (%s) = %s", cmd_to_str[last_cmd - NO_CMD][CMDL], cmd_to_str[last_cmd - NO_CMD][CMDS], status);
     screen_area_puts(ge->feedback, str);
+    */
 
     /* Dump to the terminal */
     screen_paint();
