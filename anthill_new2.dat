@@ -1,25 +1,91 @@
-#s:11|Entry|{       }| {     } |  {   }  |  {   }  |
-#s:121|CorridorONE|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
-#s:122|CorridorTWO|i _ _ _ i|i _ _ _ _|i _ _ _ _|i _ _ _ i|
-#s:123|CorridorTHREE|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
-#s:124|CorridorFOUR|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
-#s:125|CorridorFIVE|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
-#s:126|CorridorSIX|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
-#s:127|CorridorSEVEN|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
-#s:14|Hole|i  ___  \|  (   ) i|  (___) i|i       /|Hole|
-#s:13|Pantry|i _ _ _ i|i  ___  i|i [   ] i|\ [___] /|Pantry|
-#o:21|Grano|11|Grano_de_arroz|
-#o:22|Semilla|11|Semilla_de_pera|
-#o:23|Abeja|11|Abeja_común|
-#o:24|Piedra|11|Piedra_con_restos_de_hierro|
-#p:01|ant|11|5|3|
-#e:41|UAM|123|5|
-#l:31|Entry|11|121|2|1|-1|
-#l:321|Corridor1-N|121|11|1|1|-1|
-#l:322|Corridor1-S|121|122|2|1|-1|
-#l:331|Corridor2-N|122|121|1|1|-1|
-#l:332|Corridor2-S|122|123|2|1|-1|
-#l:333|Corridor2-E|122|125|3|1|-1|
+#s:1120|Entry1|{       }| {     } |  {   }  |  {   }  |
+#s:1101|F1Corridor1|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1102|F1Corridor2|i _ _ _ i|i _ _ _ _|i _ _ _ _|i _ _ _ i|
+#s:1103|F1Corridor3|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1104|F1Corridor4|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1105|F1Corridor5|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1106|F1Corridor6|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1107|F1Corridor7|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1108|F1Corridor8|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1121|Boss1|i _ _ _ i|i _ _ _ _|i _ _ _ _|i _ _ _ i|
+#s:1220|Entry2|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1201|F2Corridor1|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1202|F2Corridor2|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1203|F2Corridor3|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1204|F2Corridor4|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1205|F2Corridor5|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1206|F2Corridor6|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1207|F2Corridor7|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1208|F2Corridor8|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1209|F2Corridor9|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1210|F2Corridor10|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1211|F2Corridor11|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1212|F2Corridor12|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1213|F2Corridor13|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1214|F2Corridor14|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1215|F2Corridor15|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1221|Boss2|i _ _ _ i|i _ _ _ i|i _ _ _ i|i _ _ _ i|
+#s:1320|Entry3|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1301|F3Corridor1|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1302|F3Corridor2|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1303|F3Corridor3|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1304|F3Corridor4|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1305|F3Corridor5|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1306|F3Corridor6|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1307|F3Corridor7|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1308|F3Corridor8|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1309|F3Corridor9|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1310|F3Corridor10|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1311|F3Corridor11|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1312|F3Corridor12|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1313|F3Corridor13|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1314|F3Corridor14|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+#s:1321|Boss3|i i i i i| _ _ _ _ | _ _ _ _ |i i i i i|
+
+#l:3120|Entry1-S|120
+#l:3101|F1Corridor1-N|1101|1120
+#l:3101|F1Corridor1-E|1101|1102
+#l:3101|F1Corridor1-W|1101|1105
+#l:3102|F1Corridor2-S|1102|1103
+#l:3102|F1Corridor2-W|1102|1101
+#l:3103|F1Corridor3-N|1103|1102
+#l:3103|F1Corridor3-W|1103|1104
+#l:3104|F1Corridor4-E|1104|1103
+#l:3105|F1Corridor5-S|1105|1106
+#l:3105|F1Corridor5-E|1105|1101
+#l:3106|F1Corridor6-N|1106|1105
+#l:3106|F1Corridor6-S|1106|1107
+#l:3107|F1Corridor7-N|1107|1106
+#l:3107|F1Corridor7-E|1107|1108
+#l:3108|F1Corridor8-S|1108|1121
+#l:3108|F1Corridor8-W|1108|1107
+#l:3121|Boss1-S|1121|1220|2|0|41|
+
+
+
+
+
+#l:3320|Entry3-S|1220
+#l:3301|F3Corridor1-N|1301|1320
+#l:3301|F3Corridor1-E|1301|1305
+#l:3301|F3Corridor1-W|1301|1302
+#l:3302|F3Corridor2-S|1302|1303
+#l:3302|F3Corridor2-E|1302|1301
+#l:3303|F3Corridor3-N|1303|1302
+#l:3303|F3Corridor3-E|1303|1304
+#l:3304|F3Corridor4-W|1304|1103
+#l:3306|F3Corridor6-N|1306|1305
+#l:3306|F3Corridor6-S|1306|1307
+#l:3307|F3Corridor7-N|1307|1306
+#l:3307|F3Corridor7-W|1307|1310
+#l:3307|F3Corridor7-S|1307|1308
+
+
+
+
+
+
+
 #l:351|Corridor3-N|123|122|1|1|-1|
 #l:352|Corridor3-S|123|124|2|0|41|
 #l:361|Corridor4-N|124|123|1|1|-1|
@@ -33,3 +99,14 @@
 #l:342|Hole-S|14|13|2|1|-1|
 #l:343|Hole-W|14|127|4|1|-1|
 #l:33|Pantry|13|124|1|1|-1|
+#o:21|Grano|11|Grano_de_arroz|
+#o:22|Semilla|11|Semilla_de_pera|
+#o:23|Abeja|11|Abeja_común|
+#o:24|Piedra|11|Piedra_con_restos_de_hierro|
+#p:01|ant|11|5|3|
+#e:41|BOSS1|1121|50|
+#e:42|BOSS2|1221|70|
+#e:43|BOSS3|1321|100|
+#e:44|EnemyF1|1121|7.5|
+#e:45|EnemyF2|1221|15|
+#e:46|EnemyF3|1321|15|
