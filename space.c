@@ -25,8 +25,7 @@ struct _Space {
   Id south;                 /*!< Id of the space at the south */
   Id east;                  /*!< Id of the space at the east */
   Id west;                  /*!< Id of the space at the west */
-  Set *objects;             /*!< Object for the space */
-  char gdesc[5][10];        /*!< Graphic description of the space*/
+  Set *objects;             /*!< Objects contained in the space*/           
   char description[235];    /*!< Description of the object */
   int maplines;
   char **map; 
@@ -103,27 +102,6 @@ const char * space_get_name(Space* space) {
     return NULL;
   }
   return space->name;
-}
-
-/** It sets the description of a space
-  */
-STATUS space_set_desc(Space* space, char *desc) {
-  if (!space || !desc) {
-    return ERROR;
-  }
-  strcpy(space->description, desc);
-  return OK;
-}
-
-/** It gets the description of a space
-  */
-
-char *space_get_desc(Space* space) {
-
-  if (!space) {
-    return NULL;
-  }
-  return space->description;
 }
 
 /** It sets the id of the space located at the north
@@ -246,25 +224,24 @@ Set *space_get_set(Space *space) {
   return space->objects;
 }
 
-STATUS space_set_gdesc(Space *space, char *gdesc, int i)
-{
-  if(!space || !gdesc || (i < 0) || (i >= GDESC))
+STATUS space_set_desc(Space* space, char *desc) {
+  if (!space || !desc) {
     return ERROR;
-  
-  if(strcpy(space->gdesc[i], gdesc) == ERROR)
-    return ERROR;
-
+  }
+  strcpy(space->description, desc);
   return OK;
 }
 
-const char * space_get_gdesc(Space *space, int i)
-{
-  if(!space || (i < 0) || (i > GDESC))
-    return ERROR;
+/** It gets the description of a space
+  */
 
-  return space->gdesc[i];
+char *space_get_desc(Space* space) {
+
+  if (!space) {
+    return NULL;
+  }
+  return space->description;
 }
-
 
 /** It prints the space information
   */
@@ -309,4 +286,24 @@ STATUS space_print(Space* space) {
   set_print(stdout, space->objects);
 
   return OK;
+}
+
+STATUS space_set_map(Space *space, char **map, int n)
+{
+  if(!space || !map)
+    return ERROR;
+
+  space->map = map;
+  space->maplines = n;
+
+  return OK;
+}
+
+char **space_get_map(Space* space) {
+
+  if (!space) {
+    return NULL;
+  }
+
+  return space->map;
 }

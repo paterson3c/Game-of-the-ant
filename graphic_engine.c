@@ -72,7 +72,7 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
   Id id_act = NO_ID, id_north = NO_ID, id_south = NO_ID, id_east = NO_ID, id_west = NO_ID, obj_loc = NO_ID, player_loc = NO_ID, enemy_loc = NO_ID, *id = NULL;
   int hp_player, hp_enemy, i = 0, num_obj, z;
   Space *space_north = NULL, *space_west = NULL, *space_act = NULL, *space_east = NULL, *space_south = NULL;
-  const char *gdesc_act[GDESC];
+  char **map = NULL;
   char enemy[4] = "";
   char status[6] = "";
   char desc[235] = "";
@@ -102,10 +102,9 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
 
     /*Gets space descrpition*/
 
-    for (i = 0; i < (GDESC - 1); i++)
-    {
-      gdesc_act[i] = space_get_gdesc(space_act, i);
-    }
+    map = space_get_map(space_act);
+    printf("%s", map[0]);
+
     /*Initialize objects*/
 
     obj_act[0] = '\0';
@@ -143,34 +142,19 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
       screen_area_puts(ge->map, str);
       sprintf(str, "|m0^ %s      %3d|", enemy, (int)id_act);
       screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
+      sprintf(str, "|   %10s   |", map[i]);
       i++;
       screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
+      sprintf(str, "|   %10s   |", map[i]);
       i++;
       screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
+      sprintf(str, "|   %10s   |", map[i]);
       i++;
       screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
+      sprintf(str, "|   %10s   |", map[i]);
       i++;
       screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
-      i++;
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
-      i++;
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
-      i++;
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
-      i++;
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
-      i++;
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", gdesc_act[i]);
+      sprintf(str, "|   %10s   |", map[i]);
       i++;
       screen_area_puts(ge->map, str);
       sprintf(str, "|%16s|", obj_act);
