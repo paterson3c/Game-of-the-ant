@@ -27,7 +27,9 @@ struct _Space {
   Id west;                  /*!< Id of the space at the west */
   Set *objects;             /*!< Object for the space */
   char gdesc[5][10];        /*!< Graphic description of the space*/
-  char description[235]; /*!< Description of the object */
+  char description[235];    /*!< Description of the object */
+  int maplines;
+  char **map; 
 };
 
 /** space_create allocates memory for a new space

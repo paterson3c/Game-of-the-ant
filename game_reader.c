@@ -66,7 +66,13 @@ STATUS game_load_spaces(Game *game, char *filename) {
       toks = strtok(NULL, "|");
       strcpy(descrpit5, toks);
       toks = strtok(NULL, "|");
-
+      fgets(line, WORD_SIZE, file);
+      int nlines = atoi(line);
+      char **map = (char **) malloc(nlines*sizeof(char *));
+      for (int i=0; i<nlines; i++) {
+        fgets(line, WORD_SIZE, file);
+        map[i] = strdup(line);
+      }
 #ifdef DEBUG
       printf("Leido: %ld|%s|%s|%s|%s|%s|%s|%s\n", id, name, descrpit1, descrpit2, descrpit3, descrpit4, descrpit5, desc);
 #endif
@@ -83,6 +89,7 @@ STATUS game_load_spaces(Game *game, char *filename) {
         space_set_gdesc(space, descrpit3, 2);
         space_set_gdesc(space, descrpit4, 3);
         space_set_gdesc(space, descrpit5, 4);
+        space_set_map(space, map, nlines);/*Hacer funcion en space*/
   
         game_add_space(game, space);
       }
