@@ -14,6 +14,7 @@ struct _Object
     char name[WORD_SIZE + 1]; /*!< Name of the object */
     char description[235]; /*!< Description of the object */
     BOOL consumable; /*!< If the object is consumable or not */
+    int type; /*!< Type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary) */
 };
 
 /**
@@ -206,5 +207,39 @@ STATUS object_setIfConsumable(Object *object, BOOL consumable)
         return ERROR;
     }
     object->consumable = consumable;
+    return OK;
+}
+
+/**
+ * @brief It gets the type attribute of an object
+ * @param object a pointer to the object
+ * 
+ * 
+ * @return the type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary)
+*/
+int object_getType(Object *object)
+{
+    if (!object)
+    {
+        return -1;
+    }
+    return object->type;
+}
+
+/**
+ * @brief It sets the type attribute of an object
+ * 
+ * @param object a pointer to the object
+ * @param type an integer that indicates the type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary)
+ * 
+ * @return OK if everything goes well, ERROR if there was some mistake
+*/
+STATUS object_setType(Object *object, int type)
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    object->type = type;
     return OK;
 }
