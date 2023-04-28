@@ -15,6 +15,7 @@ struct _Object
     char description[235]; /*!< Description of the object */
     BOOL consumable; /*!< If the object is consumable or not */
     int type; /*!< Type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary) */
+    BD *bd; /*!< Buffs and debuffs of the object */
 };
 
 /**
@@ -39,6 +40,9 @@ Object *object_create(Id id)
     /* Initialization of an new object*/
     newObject->id = id;
     newObject->name[0] = '\0';
+    newObject->consumable = FALSE;
+    newObject->type = 0;
+    newObject->bd = NULL;
 
     return newObject;
 }
@@ -241,5 +245,39 @@ STATUS object_setType(Object *object, int type)
         return ERROR;
     }
     object->type = type;
+    return OK;
+}
+
+/**
+ * @brief It gets the buff/debuff attribute of an object
+ * @param object a pointer to the object
+ * 
+ * 
+ * @return a pointer to the buff/debuff attribute of the object
+*/
+BD *object_getBD(Object *object)
+{
+    if (!object)
+    {
+        return NULL;
+    }
+    return object->bd;
+}
+
+/**
+ * @brief It sets the buff/debuff attribute of an object
+ * 
+ * @param object a pointer to the object
+ * @param bd a pointer to the buff/debuff attribute of the object
+ * 
+ * @return OK if everything goes well, ERROR if there was some mistake
+*/
+STATUS object_setBD(Object *object, BD *bd)
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    object->bd = bd;
     return OK;
 }

@@ -12,7 +12,7 @@ struct _Player {
     Id id;      /*Structure player's id*/
     char name[WORD_SIZE + 1]; /*Player's name*/
     Id location; /*Where the player is*/
-    Inventory *objects; /*Object weared by the player*/
+    Inventory *objects; /*Objects weared by the player*/
     int health; /*player's health*/
 };
 

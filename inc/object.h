@@ -2,6 +2,7 @@
 #define OBJECT_H
 
 #include "types.h"
+#include "buff_debuff.h"
 
 /**
  * @brief Object
@@ -94,5 +95,12 @@ BOOL object_getIfConsumable(Object* object);
  * @return OK if everything goes well, ERROR if there was some mistake
 */
 STATUS object_setIfConsumable(Object* object, BOOL consumable);
+
+
+BD *object_getBD(Object *object);
+
+
+STATUS object_setBD(Object *object, BD *bd);
+
 
 #endif
