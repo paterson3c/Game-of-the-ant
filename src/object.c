@@ -281,3 +281,19 @@ STATUS object_setBD(Object *object, BD *bd)
     object->bd = bd;
     return OK;
 }
+
+STATUS object_setBDValue(Object *object, float Bvalue, float Dvalue) 
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    
+    if(!bd_setValue(object->bd, Bvalue, Dvalue))
+    {
+        return ERROR;
+    }
+
+    return OK;
+}
+
