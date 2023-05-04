@@ -42,9 +42,10 @@ STATUS game_load_spaces(Game *game, char *filename)
   FILE *file = NULL;
   char line[WORD_SIZE] = "";
   char name[WORD_SIZE] = "";
+  char desc[WORD_SIZE] = "";
   char *toks = NULL;
-  char **map = NULL;
   int nlines = 0;
+  int i = 0;
   Id id = NO_ID;
   Space *space = NULL;
   STATUS status = OK;
@@ -68,27 +69,27 @@ STATUS game_load_spaces(Game *game, char *filename)
       id = atol(toks);
       toks = strtok(NULL, "|");
       strcpy(name, toks);
-      fgets(line, WORD_SIZE, file);
-      nlines = atoi(line);
-      map = (char **)malloc(nlines * sizeof(char *));
-      for (int i = 0; i < nlines; i++)
-      {
-        fgets(line, WORD_SIZE, file);
-        map[i] = strdup(line);
-      }
+      toks = strtok(NULL, "|");
+      strcpy(desc, toks);
+      toks = strtok(NULL, "|");
+      nlines = atoi(toks);
+
 #ifdef DEBUG
-      printf("Leido: %ld|%s|\n", id, name);
+      printf("Leido: %ld|%s|%s|%d\n", id, name, desc, nlines);
 #endif
       space = space_create(id);
       if (space != NULL)
       {
         space_set_name(space, name);
-        space_set_desc(space, name);
-        printf("Name: %s ", name);
-        printf("Name_taken: %s ", space_get_name(space));
-        printf("Desc_taken: %s ", space_get_desc(space));
-        space_set_map(space, map, nlines);
+        space_set_desc(space, desc);
+        space_set_nlines(space, nlines);
         game_add_space(game, space);
+
+        for (int i = 0; i < nlines; i++)
+        {
+          fgets(line, WORD_SIZE, file);
+          space_set_gdesc(space, line, i);
+        }
       }
     }
   }

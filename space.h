@@ -17,9 +17,8 @@
 
 typedef struct _Space Space;
 
-#define MAX_SPACES 100
+#define MAX_SPACES 200
 #define FIRST_SPACE 1
-#define GDESC 5
 
 /**
   * @brief It creates a new space, allocating memory and initializing its memebers
@@ -68,6 +67,25 @@ STATUS space_set_name(Space* space, char* name);
 const char* space_get_name(Space* space);
 
 /**
+  * @brief It sets the description of a space
+  * @author Rafael Romero
+  * 
+  * @param space a pointer to the space
+  * @param name a string with the description to store
+  * @return OK, if everything goes well or ERROR if there was some mistake 
+  */
+STATUS space_set_desc(Space* space, char* desc);
+
+/**
+  * @brief It gets the description of a space
+  * @author Rafael Romero
+  * 
+  * @param space a pointer to the space
+  * @return  a string with the description of the space
+  */
+
+char *space_get_desc(Space* space);
+/**
   * @brief It sets the id of the space located at the north
   * @author Profesores PPROG
   * 
@@ -76,7 +94,6 @@ const char* space_get_name(Space* space);
   * @return OK, if everything goes well or ERROR if there was some mistake 
   */
 STATUS space_set_north(Space* space, Id id);
-
 /**
   * @brief It gets the id of the space located at the north
   * @author Profesores PPROG
@@ -190,6 +207,29 @@ Id *space_get_objects(Space *space);
 Set *space_get_set(Space *space);
 
 /**
+  * @brief It sets the description of a space
+  *
+  * @param space a pointer to the space
+  * @param gdesd a description of the space
+  * @param i number of a char of the string gdesc
+  * 
+  * @return OK, if everything goes well or ERROR if there was some mistake
+  */
+STATUS space_set_gdesc(Space *space, char *gdesc, int i);
+
+
+/**
+  * @brief It gets the description of a space
+  *
+  * @param space a pointer to the space
+  * @param i number of a char of the string gdesc
+  * 
+  * @return the space desc or NULL in case of ERROR
+  */
+const char * space_get_gdesc(Space *space, int i);
+
+
+/**
   * @brief It prints the space information
   * @author Profesores PPROG
   *
@@ -200,39 +240,21 @@ Set *space_get_set(Space *space);
 STATUS space_print(Space* space);
 
 /**
-  * @brief It sets the description of a space
-  * @author Rafael Romero
-  * 
-  * @param space a pointer to the space
-  * @param name a string with the description to store
-  * @return OK, if everything goes well or ERROR if there was some mistake 
-  */
-STATUS space_set_desc(Space* space, char* desc);
-
-/**
-  * @brief It gets the description of a space
-  * @author Rafael Romero
-  * 
-  * @param space a pointer to the space
-  * @return  a string with the description of the space
-  */
-
-char *space_get_desc(Space* space);
-
-/**
-  * @brief It sets the map of a space
+  * @brief It sets the number of lines of a space
   *
   * @param space a pointer to the space
-  * @param map the map we want to include
-  * @param n number of files of the map
+  * @param n number of lines 
+  * @return OK, if everything goes well or ERROR if there was some mistake
   */
-STATUS space_set_map(Space *space, char **map, int n);
+STATUS space_set_nlines(Space *space, int n);
 
 /**
-  * @brief It gets the map of a space
+  * @brief It gets the number of lines of a space
   *
   * @param space a pointer to the space
+  * 
+  * @return the number of lines or -1 in case of ERROR
   */
-char **space_get_map(Space* space);
+int space_get_nlines(Space *space);
 
 #endif

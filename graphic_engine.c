@@ -70,9 +70,8 @@ void graphic_engine_destroy(Graphic_engine *ge)
 void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
 {
   Id id_act = NO_ID, id_north = NO_ID, id_south = NO_ID, id_east = NO_ID, id_west = NO_ID, obj_loc = NO_ID, player_loc = NO_ID, enemy_loc = NO_ID, *id = NULL;
-  int hp_player, hp_enemy, i = 0, num_obj, z;
+  int hp_player, hp_enemy, i = 0, num_obj, z, nlines;
   Space *space_north = NULL, *space_west = NULL, *space_act = NULL, *space_east = NULL, *space_south = NULL;
-  char **map = NULL;
   char enemy[4] = "";
   char status[6] = "";
   char desc[235] = "";
@@ -80,21 +79,20 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
   char aux[100] = "", obj_act[100] = "";
   T_Command last_cmd = UNKNOWN;
   extern char *cmd_to_str[N_CMD][N_CMDT];
+  const char *gdesc[20];
 
   /* Paint the in the map area */
   screen_area_clear(ge->map);
 
   if ((id_act = game_get_player_location(game)) != NO_ID)
   {
-
-    space_act = game_get_space(game, id_act);
-
     /*Sets the ids*/
     id_north = link_getDestination(game_get_link(game, space_get_north(space_act)));
     id_south = link_getDestination(game_get_link(game, space_get_south(space_act)));
     id_east = link_getDestination(game_get_link(game, space_get_east(space_act)));
     id_west = link_getDestination(game_get_link(game, space_get_west(space_act)));
 
+    space_act = game_get_space(game, id_act);
     space_north = game_get_space(game, id_north);
     space_west = game_get_space(game, id_west);
     space_east = game_get_space(game, id_east);
@@ -102,13 +100,18 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
 
     /*Gets space descrpition*/
 
-    map = space_get_map(space_act);
-    printf("%s", map[0]);
+    nlines = space_get_nlines(space_act);
+
+    for (int i = 0; i < nlines; i++)
+    {
+      gdesc[i] = space_get_gdesc(space_act, i);
+    }
 
     /*Initialize objects*/
 
     obj_act[0] = '\0';
     aux[0] = '\0';
+
     /*Prints the objects of each space*/
 
     id = space_get_objects(space_act);
@@ -134,28 +137,18 @@ void graphic_engine_paint_game(Graphic_engine *ge, Game *game)
     else
       strcpy(enemy, "   ");
 
-    printf("A:%ld\n", id_act);
     i = 0;
+
     if (id_act != NO_ID)
     {
       sprintf(str, "+----------------+");
       screen_area_puts(ge->map, str);
       sprintf(str, "|m0^ %s      %3d|", enemy, (int)id_act);
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", map[i]);
-      i++;
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", map[i]);
-      i++;
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", map[i]);
-      i++;
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", map[i]);
-      i++;
-      screen_area_puts(ge->map, str);
-      sprintf(str, "|   %10s   |", map[i]);
-      i++;
+      for (i = 0; i < nlines; i++)
+      {
+        screen_area_puts(ge->map, str);
+        sprintf(str, "|   %s   |", gdesc[i]);
+      }
       screen_area_puts(ge->map, str);
       sprintf(str, "|%16s|", obj_act);
       screen_area_puts(ge->map, str);
