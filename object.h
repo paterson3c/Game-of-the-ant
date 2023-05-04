@@ -2,6 +2,7 @@
 #define OBJECT_H
 
 #include "types.h"
+#include "buff_debuff.h"
 
 /**
  * @brief Object
@@ -75,5 +76,52 @@ const char* object_get_desc(Object* object);
   * @return OK, if everything goes well or ERROR if there was some mistake
   */
 STATUS object_print(Object* object);
+
+/**
+ * @brief It gets the consumable status of an object
+ * 
+ * 
+ * @param object a pointer to the object
+ * @return TRUE if the object is consumable, FALSE if it is not
+ */
+BOOL object_getIfConsumable(Object* object);
+
+/**
+ * @brief It sets the consumable status of an object
+ * 
+ * 
+ * @param object a pointer to the object
+ * @param consumable TRUE if the object is consumable, FALSE if it is not
+ * @return OK if everything goes well, ERROR if there was some mistake
+*/
+STATUS object_setIfConsumable(Object* object, BOOL consumable);
+
+
+BD *object_getBD(Object *object);
+
+STATUS object_setBD(Object *object, BD *bd);
+
+STATUS object_setBDValue(Object *object, float Dvalue, float Bvalue);
+
+STATUS object_setBDType(Object *object, int Btype, int Dvalue);
+
+/**
+ * @brief It gets the type attribute of an object
+ * @param object a pointer to the object
+ * 
+ * 
+ * @return the type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary)
+*/
+int object_getType(Object *object);
+
+/**
+ * @brief It sets the type attribute of an object
+ * 
+ * @param object a pointer to the object
+ * @param type an integer that indicates the type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary)
+ * 
+ * @return OK if everything goes well, ERROR if there was some mistake
+*/
+STATUS object_setType(Object *object, int type);
 
 #endif

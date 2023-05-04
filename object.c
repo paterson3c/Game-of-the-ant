@@ -13,6 +13,9 @@ struct _Object
     Id id;                    /*!< Id number of the object, it must be unique */
     char name[WORD_SIZE + 1]; /*!< Name of the object */
     char description[235]; /*!< Description of the object */
+    BOOL consumable; /*!< If the object is consumable or not */
+    int type; /*!< Type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary) */
+    BD *bd; /*!< Buffs and debuffs of the object */
 };
 
 /**
@@ -37,6 +40,9 @@ Object *object_create(Id id)
     /* Initialization of an new object*/
     newObject->id = id;
     newObject->name[0] = '\0';
+    newObject->consumable = FALSE;
+    newObject->type = 0;
+    newObject->bd = NULL;
 
     return newObject;
 }
@@ -173,3 +179,136 @@ STATUS object_print(Object *object)
 
     return OK;
 }
+
+/**
+ * @brief It gets the consumable attribute of an object
+ * @param object a pointer to the object
+ * 
+ * 
+ * @return TRUE if the object is consumable, FALSE if it is not
+*/
+BOOL object_getIfConsumable(Object *object)
+{
+    if (!object)
+    {
+        return FALSE;
+    }
+    return object->consumable;
+}
+
+/**
+ * @brief It sets the consumable attribute of an object
+ * 
+ * @param object a pointer to the object
+ * @param consumable a boolean that indicates if the object is consumable or not
+ * 
+ * @return OK if everything goes well, ERROR if there was some mistake
+*/
+STATUS object_setIfConsumable(Object *object, BOOL consumable)
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    object->consumable = consumable;
+    return OK;
+}
+
+/**
+ * @brief It gets the type attribute of an object
+ * @param object a pointer to the object
+ * 
+ * 
+ * @return the type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary)
+*/
+int object_getType(Object *object)
+{
+    if (!object)
+    {
+        return -1;
+    }
+    return object->type;
+}
+
+/**
+ * @brief It sets the type attribute of an object
+ * 
+ * @param object a pointer to the object
+ * @param type an integer that indicates the type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary)
+ * 
+ * @return OK if everything goes well, ERROR if there was some mistake
+*/
+STATUS object_setType(Object *object, int type)
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    object->type = type;
+    return OK;
+}
+
+/**
+ * @brief It gets the buff/debuff attribute of an object
+ * @param object a pointer to the object
+ * 
+ * 
+ * @return a pointer to the buff/debuff attribute of the object
+*/
+BD *object_getBD(Object *object)
+{
+    if (!object)
+    {
+        return NULL;
+    }
+    return object->bd;
+}
+
+/**
+ * @brief It sets the buff/debuff attribute of an object
+ * 
+ * @param object a pointer to the object
+ * @param bd a pointer to the buff/debuff attribute of the object
+ * 
+ * @return OK if everything goes well, ERROR if there was some mistake
+*/
+STATUS object_setBD(Object *object, BD *bd)
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    object->bd = bd;
+    return OK;
+}
+
+STATUS object_setBDValue(Object *object, float Bvalue, float Dvalue) 
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    
+    if(!bd_setValue(object->bd, Bvalue, Dvalue))
+    {
+        return ERROR;
+    }
+
+    return OK;
+}
+
+STATUS object_setBDType(Object *object, int Btype, int Dtype) 
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    
+    if(!bd_setType(object->bd, Btype, Dtype))
+    {
+        return ERROR;
+    }
+
+    return OK;
+}
+
