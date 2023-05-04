@@ -79,7 +79,7 @@ STATUS bd_destroy(BD *bd)
 
 STATUS bd_setType(BD *bd, int Btype, int Dtype)
 {
-    if (!bd || (Btype != 0 && Btype != 1) || (Dtype != 0 || Dtype != 1))
+    if (!bd || (Btype < -1 && Btype > 3) || (Dtype < -1 || Dtype > 3))
     {
         return ERROR;
     }
