@@ -107,6 +107,9 @@ STATUS game_load_objects(Game *game, char *filename)
   char name[WORD_SIZE] = "";
   char desc[WORD_SIZE] = "";
   char *toks = NULL;
+  int type, buff, debuff;
+  float buff_cant, debuff_cant;
+  BOOL consum;
   Id id = NO_ID, id_loc = NO_ID;
   Object *object = NULL;
   STATUS status = OK;
@@ -135,14 +138,31 @@ STATUS game_load_objects(Game *game, char *filename)
       toks = strtok(NULL, "|");
       strcpy(desc, toks);
       toks = strtok(NULL, "|");
+      type = atol(toks);
+      toks = strtok(NULL, "|");
+      buff = atol(toks);
+      toks = strtok(NULL, "|");
+      buff_cant = atof(toks);
+      toks = strtok(NULL, "|");
+      debuff = atol(toks);
+      toks = strtok(NULL, "|");
+      debuff_cant = atof(toks);
+      toks = strtok(NULL, "|");
+      consum = atol(toks);
+      toks = strtok(NULL, "|");
+      
 #ifdef DEBUG
-      printf("Leido: %ld|%s|%ld\n"|%s, id, name, id_loc, desc);
+      printf("Leido: %ld|%s|%ld|%s|%d|%f|%d|%f|%d\n"|%s, id, name, id_loc, desc, buff, buff_cant, debuff, debuff_cant, consum);
 #endif
       object = object_create(id);
       if (object != NULL)
       {
         object_set_name(object, name);
         object_set_desc(object, desc);
+        object_setType(object,type);
+        object_setBDType(object,buff,debuff);
+        object_setBDValue(object,buff_cant, debuff_cant);
+        object_setIfConsumable(object, consum);
         game_add_object(game, object);
         space_add_object(game_get_space(game, id_loc), id);
       }
