@@ -104,4 +104,6 @@ STATUS object_setBD(Object *object, BD *bd);
 
 STATUS object_setBDValue(Object *object, float Dvalue, float Bvalue);
 
+STATUS object_setBDType(Object *object, int Btype, int Dvalue);
+
 #endif

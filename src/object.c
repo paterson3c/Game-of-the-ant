@@ -297,3 +297,20 @@ STATUS object_setBDValue(Object *object, float Bvalue, float Dvalue)
     return OK;
 }
 
+STATUS object_setBDType(Object *object, int Btype, int Dtype) 
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    
+    if(!bd_setType(object->bd, Btype, Dtype))
+    {
+        return ERROR;
+    }
+
+    return OK;
+}
+
+
+
