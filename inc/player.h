@@ -12,6 +12,7 @@
 #include "types.h"
 #include "object.h"
 #include "inventory.h"
+#include "xp.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -159,5 +160,22 @@ int player_print(FILE *pf, Player *p);
  * @return returns the status (OK/ERROR) of the action.
 */
 STATUS player_setInventory(Player *p, Inventory *inv);
+
+
+STATUS player_setAttack(Player *p, int value);
+
+int player_getAttack(Player *p);
+
+STATUS player_setDefense(Player *p, int value);
+
+int player_getDefense(Player *p);
+
+STATUS player_setXP(Player *p, XP *xp);
+
+int player_getXP(Player *p);
+
+int player_getMaxXP(Player *p);
+
+STATUS player_setMaxXP(Player *p, XP *xp);
 
 #endif

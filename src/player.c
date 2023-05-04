@@ -14,6 +14,9 @@ struct _Player {
     Id location; /*Where the player is*/
     Inventory *objects; /*Objects weared by the player*/
     int health; /*player's health*/
+    XP* xp; /*player's xp*/
+    int attack; /*player's attack*/
+    int defense; /*player's defense*/
 };
 
 /*----------------------------------------------------------------------------------------------------*/
@@ -181,5 +184,81 @@ STATUS player_setInventory(Player *p, Inventory *inv) {
     if((p->objects = inv) == NULL)
         return ERROR;
     
+    return OK;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+Inventory *player_getInventory(Player *p) {
+    if(!p)
+        return NULL;
+    
+    return p->objects;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+STATUS player_setAttack(Player *p, int value) {
+    if(!p || value<0)
+        return ERROR;
+    
+    p->attack = value;
+    return OK;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+int player_getAttack(Player *p) {
+    if(!p)
+        return -1;
+    
+    return p->attack;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+STATUS player_setDefense(Player *p, int value) {
+    if(!p || value<0)
+        return ERROR;
+    
+    p->defense = value;
+    return OK;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+int player_getDefense(Player *p) {
+    if(!p)
+        return -1;
+    
+    return p->defense;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+STATUS player_setXP(Player *p, XP *xp) {
+    if(!p || !xp)
+        return ERROR;
+    
+    xp_setXp(p->xp, xp_getXp(xp));
+    return OK;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+int player_getXP(Player *p) {
+    if(!p)
+        return NULL;
+    
+    return xp_getXp(p->xp);
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+int player_getMaxXP(Player *p) {
+    if(!p)
+        return NULL;
+    
+    return xp_getMaxXp(p->xp);
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+STATUS player_setMaxXP(Player *p, XP *xp) {
+    if(!p || !xp)
+        return ERROR;
+    
+    xp_setMaxXp(p->xp, xp_getMaxXp(xp));
     return OK;
 }
