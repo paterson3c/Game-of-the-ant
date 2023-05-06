@@ -18,6 +18,7 @@ struct _XP
     int level;
     int maxLevel;
     int max_XP;
+    int lvl;
 };
 
 XP *xp_create()
@@ -31,9 +32,9 @@ XP *xp_create()
     }
 
     newXP->xp = 0;
-    newXP->level = 0;
+    newXP->level = 1;
     newXP->maxLevel = 7;
-    newXP->max_XP = 5;
+    newXP->max_XP = 10;
 
     return newXP;
 }
@@ -108,16 +109,14 @@ STATUS xp_levelUp(XP *xp)
         return ERROR;
     }
 
-    if (xp->level < xp->maxLevel)
-    {
-        xp_setLevel(xp, xp_getLevel(xp) + 1);
+    
+    xp_setLevel(xp, xp_getLevel(xp) + 1);
+
+    if(xp->level == 5)
         xp_setMaxXp(xp, xp_getXp(xp)+10);
-        xp_setXp(xp, 0);
-    }
-    else
-    {
-        xp_setXp(xp, xp_getMaxXp(xp));
-    }
+    
+    xp_setMaxXp(xp, xp_getXp(xp)+10);
+    xp_setXp(xp, 0);
 
     return OK;
 }

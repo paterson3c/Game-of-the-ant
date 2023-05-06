@@ -118,12 +118,4 @@ STATUS xp_getMaxXp(XP *xp);
 */
 STATUS xp_print(XP *xp);
 
-
-
-
-
-
-
-
-
 #endif

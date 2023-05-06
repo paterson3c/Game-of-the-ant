@@ -14,6 +14,7 @@ struct _Enemy
     char name[WORD_SIZE + 1]; /*Enemy's name*/
     Id location;              /*Where the enemy is*/
     int health;               /*Health of te enemy*/
+    BOOL position[3][3];       /*Enemy's position*/
 };
 
 /*----------------------------------------------------------------------------------------------------*/
@@ -131,4 +132,38 @@ int enemy_print(Enemy *e)
     n += printf("Enemy(Id: %ld, Name: %s, Location: %ld)\n", enemy_getId(e), enemy_getName(e), enemy_getLocation(e));
 
     return n;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+STATUS enemy_setPosition(Enemy *p, int x, int y) {
+    if(!p || x<0 || x>2 || y<0 || y>2)
+        return ERROR;
+
+    if(enemy_resetPosition(p) == ERROR) 
+        return ERROR;
+    
+    p->position[x][y] = TRUE;
+    return OK;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+BOOL enemy_isHere(Enemy *p, int i, int j) {
+    if(!p)
+        return FALSE;
+    
+    return p->position[i][j];
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+STATUS enemy_resetPosition(Enemy *p) {
+    int i, j;
+    if(!p)
+        return ERROR;
+    
+    for(i=0; i<3; i++) {
+        for(j=0; j<3; j++) {
+            p->position[i][j] = FALSE;
+        }
+    }
+    return OK;
 }

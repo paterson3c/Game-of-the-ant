@@ -102,8 +102,33 @@ BD *object_getBD(Object *object);
 
 STATUS object_setBD(Object *object, BD *bd);
 
-STATUS object_setBDValue(Object *object, float Dvalue, float Bvalue);
+STATUS object_setBDValue(Object *object, float value);
 
-STATUS object_setBDType(Object *object, int Btype, int Dvalue);
+STATUS object_setBDType(Object *object, BDTYPE type);
+
+/**
+ * @brief It sets the Player's position.
+ * @param o Pointer to structure Object.
+ * @param x New x coordinate.
+ * @param y New y coordinate.
+ * @return returns the status (OK/ERROR) of the action.
+*/
+STATUS object_setPosition(Object *o, int x, int y);
+
+/**
+ * @brief It says if the player is in a given position.
+ * @param o Pointer to structure Object.
+ * @param x Coordinate x.
+ * @param y Coordinate y.
+ * @return returns TRUE if the player is in that position, else, it returns FALSE.
+ */
+BOOL object_isHere(Object *o, int x, int y);
+
+/**
+ * @brief It resets the player's position to the initial one.
+ * @param o Pointer to structure Player.
+ * @return returns the status (OK/ERROR) of the action.
+ */
+STATUS object_resetPosition(Object *o);
 
 #endif

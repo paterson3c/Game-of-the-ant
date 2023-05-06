@@ -48,7 +48,7 @@
 
 #o:204|Nombre|Tipo|Buff|Buff_cant|Debuff|Debuff_cant|Consumible|
 
-#o:201|Stick|1|1|0.1
+#o:201|Stick|1|1|0.1|2|1
 #o:202|Wood_Sword|2|1|0.3
 #o:203|Iron_Sword|3|1|1.5
 #o:204|Pizza_Box|1|2|0.25

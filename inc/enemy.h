@@ -93,6 +93,31 @@ STATUS enemy_setHealth(Enemy *e, int h);
 STATUS enemy_destroy(Enemy *e);
 
 /**
+ * @brief It sets the enemy's position.
+ * @param p Pointer to structure enemy.
+ * @param x New x coordinate.
+ * @param y New y coordinate.
+ * @return returns the status (OK/ERROR) of the action.
+*/
+STATUS enemy_setPosition(Enemy *p, int x, int y);
+
+/**
+ * @brief It says if the enemy is in a given position.
+ * @param p Pointer to structure enemy.
+ * @param x Coordinate x.
+ * @param y Coordinate y.
+ * @return returns TRUE if the enemy is in that position, else, it returns FALSE.
+ */
+BOOL enemy_isHere(Enemy *p, int x, int y);
+
+/**
+ * @brief It resets the enemy's position to the initial one.
+ * @param p Pointer to structure enemy.
+ * @return returns the status (OK/ERROR) of the action.
+ */
+STATUS enemy_resetPosition(Enemy *p);
+
+/**
  * @brief displays on screen the Enemy's id, name and location.
  * @param pf File where the info is printed.
  * @param e Pointer to structure Enemy.

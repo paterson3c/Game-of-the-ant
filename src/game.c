@@ -1099,55 +1099,65 @@ void game_command_move(Game *g)
 /*NORTH*/
   if (direction == 'n' || direction == 'N') {
 
-    link_id = space_get_north(game_get_space(g, space_id));
-    if (link_id != NO_ID) {
-      if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
-        aux = req = link_getRequirement(game_get_link(g, link_id));
-        while (aux != 0) {
-            first_digit = aux % 10;
-            aux /= 10;
-        }
-        if (first_digit == 2) {
-          if(player_hasObject(g->play, req) == TRUE) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+    if(player_isHere(g->play, 2, 1) == TRUE) {
+      link_id = space_get_north(game_get_space(g, space_id));
+      if (link_id != NO_ID) {
+        if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
+          aux = req = link_getRequirement(game_get_link(g, link_id));
+          while (aux != 0) {
+              first_digit = aux % 10;
+              aux /= 10;
           }
-          else { 
-            fprintf(stdout, "You need to have the object %s to open this door\n", object_get_name(game_get_object(g, req)));
-            g->cmd_st = ERROR;
-            return;
+          if (first_digit == 2) {
+            if(player_hasObject(g->play, req) == TRUE) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else { 
+              fprintf(stdout, "You need to have the object %s to open this door\n", object_get_name(game_get_object(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
-        }
-        else if(first_digit == 4) {
-          if(enemy_getHealth(game_get_enemy(g, req)) == 0) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+          else if(first_digit == 4) {
+            if(enemy_getHealth(game_get_enemy(g, req)) == 0) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else {
+              fprintf(stdout, "You need to kill the enemy %s to open this door\n", enemy_getName(game_get_enemy(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
           else {
-            fprintf(stdout, "You need to kill the enemy %s to open this door\n", enemy_getName(game_get_enemy(g, req)));
+            printf("Error 4");
             g->cmd_st = ERROR;
             return;
           }
         }
-        else {
-          printf("Error 4");
-          g->cmd_st = ERROR;
-          return;
+        if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
+          if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
+            printf("Error 5");
+            g->cmd_st = ERROR;
+            return;
+          }
+          else
+            player_setLocation(g->play, current_id);
         }
       }
-      if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
-        if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
-          printf("Error 5");
-          g->cmd_st = ERROR;
-          return;
-        }
-        else
-          player_setLocation(g->play, current_id);
+      else {
+        printf("Error 6");
+        g->cmd_st = ERROR;
+        return;
       }
-    }
-    else {
-      printf("Error 6");
+      
+    } else if(player_getPositionI(g->play) == 2) {
       g->cmd_st = ERROR;
       return;
     }
+    else {
+      
+    }
+    
   }
   /*SOUTH*/
   else if (direction == 's' || direction == 'S') {

@@ -10,12 +10,13 @@
  */
 struct _Object
 {
-    Id id;                    /*!< Id number of the object, it must be unique */
-    char name[WORD_SIZE + 1]; /*!< Name of the object */
-    char description[235]; /*!< Description of the object */
-    BOOL consumable; /*!< If the object is consumable or not */
-    int type; /*!< Type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary) */
-    BD *bd; /*!< Buffs and debuffs of the object */
+    Id id;                      /*!< Id number of the object, it must be unique */
+    char name[WORD_SIZE + 1];   /*!< Name of the object */
+    char description[235];      /*!< Description of the object */
+    BOOL consumable;            /*!< If the object is consumable or not */
+    int type;                   /*!< Type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary) */
+    BD *bd;                     /*!< Buffs and debuffs of the object */
+    int position[3][3];         /*!< Position of the object */
 };
 
 /**
@@ -238,7 +239,7 @@ int object_getType(Object *object)
  * 
  * @return OK if everything goes well, ERROR if there was some mistake
 */
-STATUS object_setType(Object *object, int type)
+STATUS object_setType(Object *object, BDTYPE type)
 {
     if (!object)
     {
@@ -282,14 +283,14 @@ STATUS object_setBD(Object *object, BD *bd)
     return OK;
 }
 
-STATUS object_setBDValue(Object *object, float Bvalue, float Dvalue) 
+STATUS object_setBDValue(Object *object, float value) 
 {
     if (!object)
     {
         return ERROR;
     }
     
-    if(!bd_setValue(object->bd, Bvalue, Dvalue))
+    if(!bd_setValue(object->bd, value))
     {
         return ERROR;
     }
@@ -297,14 +298,14 @@ STATUS object_setBDValue(Object *object, float Bvalue, float Dvalue)
     return OK;
 }
 
-STATUS object_setBDType(Object *object, int Btype, int Dtype) 
+STATUS object_setBDType(Object *object, BDTYPE type) 
 {
     if (!object)
     {
         return ERROR;
     }
     
-    if(!bd_setType(object->bd, Btype, Dtype))
+    if(!bd_setType(object->bd, type))
     {
         return ERROR;
     }
@@ -312,5 +313,37 @@ STATUS object_setBDType(Object *object, int Btype, int Dtype)
     return OK;
 }
 
+/*----------------------------------------------------------------------------------------------------*/
+STATUS object_setPosition(Object *o, int x, int y) {
+    if(!o || x<0 || x>2 || y<0 || y>2)
+        return ERROR;
 
+    if(object_resetPosition(o) == ERROR) 
+        return ERROR;
+    
+    o->position[x][y] = TRUE;
+    return OK;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+BOOL object_isHere(Object *o, int x, int y) {
+    if(!o)
+        return FALSE;
+    
+    return o->position[x][y];
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+STATUS object_resetPosition(Object *o) {
+    int i, j;
+    if(!o)
+        return ERROR;
+    
+    for(i=0; i<3; i++) {
+        for(j=0; j<3; j++) {
+            o->position[i][j] = FALSE;
+        }
+    }
+    return OK;
+}
 
