@@ -161,21 +161,72 @@ int player_print(FILE *pf, Player *p);
 */
 STATUS player_setInventory(Player *p, Inventory *inv);
 
-
+/**
+ * @brief It sets the Player's attack.
+ * 
+ * @param p Pointer to structure Player.
+ * @param value New attack value.
+ * @return returns the status (OK/ERROR) of the action.q
+*/
 STATUS player_setAttack(Player *p, int value);
 
+/**
+ * @brief It gets the Player's attack.
+ * 
+ * @param p Pointer to structure Player.
+ * @return returns the Player's attack.
+*/
 int player_getAttack(Player *p);
 
+/**
+ * @brief It sets the Player's defense.
+ * 
+ * @param p Pointer to structure Player.
+ * @param value New defense value.
+ * @return returns the status (OK/ERROR) of the action.
+*/
 STATUS player_setDefense(Player *p, int value);
 
+/**
+ * @brief It gets the Player's defense.
+ * 
+ * @param p Pointer to structure Player.
+ * @return returns the Player's defense.
+*/
 int player_getDefense(Player *p);
 
+/**
+ * @brief It sets the Player's xp.
+ * 
+ * @param p Pointer to structure Player.
+ * @param xp Pointer to structure XP.
+ * @return returns the status (OK/ERROR) of the action.
+*/
 STATUS player_setXP(Player *p, XP *xp);
 
+/**
+ * @brief It gets the Player's xp.
+ * 
+ * @param p Pointer to structure Player.
+ * @return returns the Player's xp.
+*/
 int player_getXP(Player *p);
 
+/**
+ * @brief It gets the Player's max xp.
+ * 
+ * @param p Pointer to structure Player.
+ * @return returns the Player's max xp.
+*/
 int player_getMaxXP(Player *p);
 
+/**
+ * @brief It sets the Player's max xp.
+ * 
+ * @param p Pointer to structure Player.
+ * @param xp Pointer to structure XP.
+ * @return returns the status (OK/ERROR) of the action.
+*/
 STATUS player_setMaxXP(Player *p, XP *xp);
 
 #endif
