@@ -47,6 +47,18 @@ STATUS xp_setLevel(XP *xp, int value);
 
 int xp_getLevel(XP *xp);
 
+int xp_getXp(XP *xp);
+
+STATUS xp_levelUp(XP *xp);
+
+STATUS xp_addXp(XP *xp, int value);
+
+STATUS xp_setMaxXp(XP *xp, int value);
+
+STATUS xp_getMaxXp(XP *xp);
+
+STATUS xp_print(XP *xp);
+
 
 
 

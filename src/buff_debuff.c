@@ -103,7 +103,7 @@ STATUS bd_setValue(BD *bd, float Bvalue, float Dvalue)
 
 int bd_getType(BD *bd, int type) //type = 0 -> buff, type = 1 -> debuff
 {
-    if (!bd || type != 0 && type != 1)
+    if (!bd || (type != 0 && type != 1))
     {
         return -1;
     }
@@ -120,7 +120,7 @@ int bd_getType(BD *bd, int type) //type = 0 -> buff, type = 1 -> debuff
 
 float bd_getValue(BD *bd, int type) //type = 0 -> buff, type = 1 -> debuff
 {
-    if (!bd || type != 0 && type != 1)
+    if (!bd || (type != 0 && type != 1))
     {
         return -1;
     }

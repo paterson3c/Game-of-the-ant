@@ -241,7 +241,7 @@ STATUS player_setXP(Player *p, XP *xp) {
 /*----------------------------------------------------------------------------------------------------*/
 int player_getXP(Player *p) {
     if(!p)
-        return NULL;
+        return -1;
     
     return xp_getXp(p->xp);
 }
@@ -249,7 +249,7 @@ int player_getXP(Player *p) {
 /*----------------------------------------------------------------------------------------------------*/
 int player_getMaxXP(Player *p) {
     if(!p)
-        return NULL;
+        return -1;
     
     return xp_getMaxXp(p->xp);
 }

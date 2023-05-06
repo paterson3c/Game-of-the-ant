@@ -81,6 +81,16 @@ int xp_getXp(XP *xp)
     return xp->xp;
 }
 
+STATUS xp_getMaxXp(XP *xp)
+{
+    if (!xp)
+    {
+        return ERROR;
+    }
+
+    return xp->max_XP;
+}
+
 int xp_getLevel(XP *xp)
 {
     if (!xp)
