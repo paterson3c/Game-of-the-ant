@@ -12,6 +12,7 @@
 #include "types.h"
 #include "object.h"
 #include "inventory.h"
+#include "xp.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -159,5 +160,137 @@ int player_print(FILE *pf, Player *p);
  * @return returns the status (OK/ERROR) of the action.
 */
 STATUS player_setInventory(Player *p, Inventory *inv);
+
+/**
+ * @brief It sets the Player's attack.
+ * 
+ * @param p Pointer to structure Player.
+ * @param value New attack value.
+ * @return returns the status (OK/ERROR) of the action.q
+*/
+STATUS player_setAttack(Player *p, int value);
+
+/**
+ * @brief It gets the Player's attack.
+ * 
+ * @param p Pointer to structure Player.
+ * @return returns the Player's attack.
+*/
+int player_getAttack(Player *p);
+
+/**
+ * @brief It sets the Player's defense.
+ * 
+ * @param p Pointer to structure Player.
+ * @param value New defense value.
+ * @return returns the status (OK/ERROR) of the action.
+*/
+STATUS player_setDefense(Player *p, int value);
+
+/**
+ * @brief It gets the Player's defense.
+ * 
+ * @param p Pointer to structure Player.
+ * @return returns the Player's defense.
+*/
+int player_getDefense(Player *p);
+
+/**
+ * @brief It sets the Player's xp.
+ * 
+ * @param p Pointer to structure Player.
+ * @param xp Pointer to structure XP.
+ * @return returns the status (OK/ERROR) of the action.
+*/
+STATUS player_setXP(Player *p, XP *xp);
+
+/**
+ * @brief It gets the Player's xp.
+ * 
+ * @param p Pointer to structure Player.
+ * @return returns the Player's xp.
+*/
+int player_getXP(Player *p);
+
+/**
+ * @brief It gets the Player's max xp.
+ * 
+ * @param p Pointer to structure Player.
+ * @return returns the Player's max xp.
+*/
+int player_getMaxXP(Player *p);
+
+/**
+ * @brief It sets the Player's max xp.
+ * 
+ * @param p Pointer to structure Player.
+ * @param xp Pointer to structure XP.
+ * @return returns the status (OK/ERROR) of the action.
+*/
+STATUS player_setMaxXP(Player *p, XP *xp);
+
+STATUS player_levelUp(Player *p);
+
+/**
+ * @brief It gives the Player's inventory.
+ * @param p Pointer to structure Player.
+ * @return returns the Player's inventory, else, it returns NULL.
+*/
+Inventory *player_getInventory(Player *p);
+
+/**
+ * @brief It sets the Player's position.
+ * @param p Pointer to structure Player.
+ * @param x New x coordinate.
+ * @param y New y coordinate.
+ * @return returns the status (OK/ERROR) of the action.
+*/
+STATUS player_setPosition(Player *p, int x, int y);
+
+/**
+ * @brief It says if the player is in a given position.
+ * @param p Pointer to structure Player.
+ * @param x Coordinate x.
+ * @param y Coordinate y.
+ * @return returns TRUE if the player is in that position, else, it returns FALSE.
+ */
+BOOL player_isHere(Player *p, int x, int y);
+
+/**
+ * @brief It resets the player's position to the initial one.
+ * @param p Pointer to structure Player.
+ * @return returns the status (OK/ERROR) of the action.
+ */
+STATUS player_resetPosition(Player *p);
+
+/**
+ * @brief It gives the Player's J coordinate.
+ * @param p Pointer to structure Player.
+ * @return returns the Player's J coordinate.
+*/
+int player_getPositionJ(Player *p);
+
+/**
+ * @brief It gives the Player's I coordinate.
+ * @param p Pointer to structure Player.
+ * @return returns the Player's I coordinate.
+*/
+int player_getPositionI(Player *p);
+
+/**
+ * @brief It sets the Player's I coordinate.
+ * @param p Pointer to structure Player.
+ * @param i New I coordinate.
+ * @return returns the status (OK/ERROR) of the action.
+*/
+STATUS player_setPositionI(Player *p, int i);
+
+/**
+ * @brief It sets the Player's J coordinate.
+ * @param p Pointer to structure Player.
+ * @param j New J coordinate.
+ * @return returns the status (OK/ERROR) of the action.
+*/
+STATUS player_setPositionJ(Player *p, int j);
 
 #endif

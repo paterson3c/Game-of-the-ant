@@ -14,12 +14,12 @@
 #include "types.h"
 #include "object.h"
 #include "set.h"
-#include "enemy.h"
 
 typedef struct _Space Space;
 
-#define MAX_SPACES 200
+#define MAX_SPACES 100
 #define FIRST_SPACE 1
+#define GDESC 5
 
 /**
   * @brief It creates a new space, allocating memory and initializing its memebers
@@ -213,8 +213,6 @@ Set *space_get_set(Space *space);
   * @param space a pointer to the space
   * @param gdesd a description of the space
   * @param i number of a char of the string gdesc
-  * 
-  * @return OK, if everything goes well or ERROR if there was some mistake
   */
 STATUS space_set_gdesc(Space *space, char *gdesc, int i);
 
@@ -224,8 +222,6 @@ STATUS space_set_gdesc(Space *space, char *gdesc, int i);
   *
   * @param space a pointer to the space
   * @param i number of a char of the string gdesc
-  * 
-  * @return the space desc or NULL in case of ERROR
   */
 const char * space_get_gdesc(Space *space, int i);
 
@@ -239,27 +235,5 @@ const char * space_get_gdesc(Space *space, int i);
   * @return OK, if everything goes well or ERROR if there was some mistake
   */
 STATUS space_print(Space* space);
-
-/**
-  * @brief It sets the number of lines of a space
-  *
-  * @param space a pointer to the space
-  * @param n number of lines 
-  * @return OK, if everything goes well or ERROR if there was some mistake
-  */
-STATUS space_set_nlines(Space *space, int n);
-
-/**
-  * @brief It gets the number of lines of a space
-  *
-  * @param space a pointer to the space
-  * 
-  * @return the number of lines or -1 in case of ERROR
-  */
-int space_get_nlines(Space *space);
-
-
-Enemy *space_get_enemy(Space *space);
-STATUS space_set_enemy(Space *space, Enemy *enemy);
 
 #endif

@@ -43,5 +43,7 @@ BOOL inventory_contains(Inventory *inv, Id id);
 int inventory_print(FILE *pf, Inventory *inv);
 /*----------------------------------------------------------------------------------------------------*/
 STATUS inventory_setCapacity(Inventory *inv, int capacity);
+/*----------------------------------------------------------------------------------------------------*/
+Set* inventory_getSet(Inventory *inv);
 
 #endif

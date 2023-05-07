@@ -14,6 +14,7 @@
 #define WORD_SIZE 1000
 #define NO_ID -1
 #define CARRIED -2
+#define DEAD -3
 
 typedef long Id;
 
@@ -34,5 +35,12 @@ typedef enum {
   E,
   W
 } DIRECTION;
+
+typedef enum {
+  NO_TYPE,
+  ATT,
+  DEF,
+  HP
+} BDTYPE;
 
 #endif
