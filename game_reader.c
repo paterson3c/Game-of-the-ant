@@ -106,11 +106,13 @@ STATUS game_load_objects(Game *game, char *filename)
   char line[WORD_SIZE] = "";
   char name[WORD_SIZE] = "";
   char *toks = NULL;
-  int type, buff, debuff, i, j;
+  int type, buff_type, debuff_type, i, j;
   float buff_cant, debuff_cant;
   BOOL consum;
   Id id = NO_ID, id_loc = NO_ID;
   Object *object = NULL;
+  BD *buff = NULL;
+  BD *debuff = NULL;
   STATUS status = OK;
 
   if (!filename)
@@ -137,11 +139,11 @@ STATUS game_load_objects(Game *game, char *filename)
       toks = strtok(NULL, "|");
       type = atol(toks);
       toks = strtok(NULL, "|");
-      buff = atol(toks);
+      buff_type = atol(toks);
       toks = strtok(NULL, "|");
       buff_cant = atof(toks);
       toks = strtok(NULL, "|");
-      debuff = atol(toks);
+      debuff_type = atol(toks);
       toks = strtok(NULL, "|");
       debuff_cant = atof(toks);
       toks = strtok(NULL, "|");
@@ -158,10 +160,28 @@ STATUS game_load_objects(Game *game, char *filename)
       object = object_create(id);
       if (object != NULL)
       {
+        if((buff = bd_create()) == NULL)
+        {
+          object_destroy(object);
+          return ERROR;
+        }
+        if((debuff = bd_create()) == NULL)
+        {
+          object_destroy(object);
+          return ERROR;
+        }
+        
         object_set_name(object, name);
         object_setType(object,type);
-        object_setBDType(object,buff,debuff);
-        object_setBDValue(object,buff_cant, debuff_cant);
+
+        object_setBuff(object,buff);
+        object_setBuffType(object, buff_type);
+        object_setBuffValue(object, buff_cant);
+
+        object_setdebuff(object,debuff);
+        object_setdebuffType(object, debuff_type);
+        object_setdebuffValue(object, debuff_cant);
+
         object_setIfConsumable(object, consum);
         object_setPosition(object, i, j);
         game_add_object(game, object);
@@ -190,6 +210,7 @@ STATUS game_load_player(Game *game, char *filename)
   char *toks = NULL;
   Id id = NO_ID, id_loc = NO_ID;
   int health, capacity, i, j;
+  float attack, defense;
   Player *player = NULL;
   Inventory *inventory = NULL;
   STATUS status = OK;
@@ -220,12 +241,16 @@ STATUS game_load_player(Game *game, char *filename)
       toks = strtok(NULL, "|");
       capacity = atol(toks);
       toks = strtok(NULL, "|");
-      i = atof(toks);
+      attack = atof(toks);
+      toks = strtok(NULL, "|");
+      defense = atof(toks);
+      toks = strtok(NULL, "|");
+      i = atol(toks);
       toks = strtok(NULL, "|");
       j = atol(toks);
       toks = strtok(NULL, "|");
 #ifdef DEBUG
-      printf("Leido: %ld|%s|%ld|%d|%d|%d|%d\n", id, name, id_loc, health, capacity, i, j);
+      printf("Leido: %ld|%s|%ld|%d|%d|%f|%f|%d|%d\n", id, name, id_loc, health, capacity, attack, defense, i, j);
 #endif
       player = player_create(id);
       if (player != NULL)
@@ -239,6 +264,8 @@ STATUS game_load_player(Game *game, char *filename)
         player_setLocation(player, id_loc);
         player_setPosition(player, i, j);
         player_setHealth(player, health);
+        player_setAttack(player, attack);
+        player_setDefense(player,defense);
         inventory_setCapacity(inventory, capacity);
         player_setInventory(player, inventory);
         game_add_player(game, player);
@@ -266,6 +293,7 @@ STATUS game_load_enemy(Game *game, char *filename)
   char *toks = NULL;
   Id id = NO_ID, id_loc = NO_ID;
   int health, i, j;
+  float attack, defense;
   Enemy *enemy = NULL;
   STATUS status = OK;
 
@@ -293,12 +321,16 @@ STATUS game_load_enemy(Game *game, char *filename)
       toks = strtok(NULL, "|");
       health = atol(toks);
       toks = strtok(NULL, "|");
+      attack = atof(toks);
+      toks = strtok(NULL, "|");
+      defense = atof(toks);
+      toks = strtok(NULL, "|");
       i = atof(toks);
       toks = strtok(NULL, "|");
       j = atol(toks);
       toks = strtok(NULL, "|");
 #ifdef DEBUG
-      printf("Leido: %ld|%s|%ld|%d|%d|%d\n", id, name, id_loc, health, i, j);
+      printf("Leido: %ld|%s|%ld|%d|%f|%f|%d|%d\n", id, name, id_loc, health, i, j);
 #endif
       enemy = enemy_create();
       if (enemy != NULL)
@@ -307,6 +339,8 @@ STATUS game_load_enemy(Game *game, char *filename)
         enemy_setName(enemy, name);
         enemy_setLocation(enemy, id_loc);
         enemy_setHealth(enemy, health);
+        enemy_setAttack(enemy, attack);
+        enemy_setDefense(enemy, defense);
         enemy_setPosition(enemy,i,j);
         game_add_enemy(game, enemy);
       }
