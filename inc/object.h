@@ -101,6 +101,9 @@ BD *object_getBuff(Object *object);
 
 BD *object_getDebuff(Object *object);
 
+BDTYPE object_getBuffType(Object *object);
+
+BDTYPE object_getDebuffType(Object *object);
 
 STATUS object_setBuff(Object *object, BD *bd);
 
@@ -113,6 +116,10 @@ STATUS object_setDebuffValue(Object *object, float value);
 STATUS object_setBuffType(Object *object, BDTYPE type);
 
 STATUS object_setDebuffType(Object *object, BDTYPE type);
+
+float object_getBuffValue(Object *object);
+
+float object_getDebuffValue(Object *object);
 
 /**
  * @brief It sets the Player's position.

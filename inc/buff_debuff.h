@@ -65,7 +65,7 @@ BDTYPE bd_getType(BD *bd);
  * @param type 0 for buff, 1 for debuff
  * @return the value of the buff/debuff
  */
-float bd_getValue(BD *bd, BDTYPE type);
+float bd_getValue(BD *bd);
 
 /**
  * @brief It prints the buff/debuff

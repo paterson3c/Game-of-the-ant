@@ -233,6 +233,42 @@ int object_getType(Object *object)
     return object->type;
 }
 
+BDTYPE object_getBuffType(Object *object)
+{
+    if (!object)
+    {
+        return NULL;
+    }
+    return bd_getType(object->buff);
+}
+
+BDTYPE object_getDebuffType(Object *object)
+{
+    if (!object)
+    {
+        return NULL;
+    }
+    return bd_getType(object->debuff);
+}
+
+float object_getBuffValue(Object *object)
+{
+    if (!object)
+    {
+        return -1;
+    }
+    return bd_getValue(object->buff);
+}
+
+float object_getDebuffValue(Object *object)
+{
+    if (!object)
+    {
+        return -1;
+    }
+    return bd_getValue(object->debuff);
+}
+
 /**
  * @brief It sets the type attribute of an object
  * 

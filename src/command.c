@@ -20,10 +20,11 @@ char *cmd_to_str[N_CMD]
 			{"e", "Exit"},
       {"t", "Take"},
       {"d", "Drop"},
-      {"a", "Attack"},
       {"m", "Move"},
       {"i", "Inspect"},
-      {"c", "Combat"}
+      {"c", "Combat"},
+      {"u", "Use"},
+      {"a", "Admin"}
 };
 
 

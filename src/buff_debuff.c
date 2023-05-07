@@ -70,7 +70,7 @@ BDTYPE bd_getType(BD *bd)
     return bd->type;
 }
 
-float bd_getValue(BD *bd, BDTYPE type)
+float bd_getValue(BD *bd)
 {
     if (!bd)
         return 0;

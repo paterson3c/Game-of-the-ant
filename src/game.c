@@ -23,10 +23,11 @@ void game_command_unknown(Game *game);
 void game_command_exit(Game *game);
 void game_command_take(Game *game);
 void game_command_drop(Game *game);
-void game_command_attack(Game *game);
 void game_command_move(Game *game);
 void game_command_inspect(Game *game);
 void game_command_combat(Game *game);
+void game_command_use(Game *game);
+void game_command_admin(Game *game);
 
 Enemy *_game_get_enemy_fromPlayer_location(Game *game) {
   int i = 0;
@@ -501,6 +502,12 @@ STATUS game_update(Game *game, T_Command cmd)
   game->cmd_st = OK;
   game->rounds++;
   game->attack_failed = FALSE;
+  game->attack_critical = FALSE;
+  if (game->rounds == game->nerf_round) {
+    player_setDefense(game->play, player_getDefense(game->play) + 5);
+    game->nerf_round = 0;
+  }
+  game->description[0] = '\0';
 
   switch (cmd)
   {
@@ -520,8 +527,8 @@ STATUS game_update(Game *game, T_Command cmd)
     game_command_drop(game);
     break;
 
-  case ATTACK:
-    game_command_attack(game);
+  case USE:
+    game_command_use(game);
     break;
 
   case MOVE:
@@ -534,6 +541,10 @@ STATUS game_update(Game *game, T_Command cmd)
 
   case COMBAT:
     game_command_combat(game);
+    break;
+  
+  case ADMIN:
+    game_command_admin(game);
     break;
 
   default:
@@ -628,6 +639,9 @@ void game_command_take(Game *g)
 {
   Id space_id, object_id = NO_ID;
   char object_name[WORD_SIZE + 1];
+  BDTYPE buff_type = NO_TYPE, nerf_type = NO_TYPE;
+  Object *object = NULL;
+
 
   if (g == NULL)
   {
@@ -650,6 +664,13 @@ void game_command_take(Game *g)
     return;
   }
 
+  object = game_get_object(g, object_id);
+  if (object == NULL)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
   if ((game_get_object_location(g, object_id) != space_id) || (space_has_object(game_get_space(g, space_id), object_id) == FALSE))
   {
     g->cmd_st = ERROR;
@@ -658,6 +679,45 @@ void game_command_take(Game *g)
 
   space_delete_object(game_get_space(g, space_id), object_id);
   player_addObject(g->play, object_id);
+
+  buff_type = bd_getType(object_getBuff(object));
+  nerf_type = bd_getType(object_getNerf(object));
+
+  if(object_getIfConsumable(object) == FALSE) {
+    switch (buff_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+
+      default:
+        break;
+    }
+
+    switch (nerf_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+
+      default:
+        break;
+    }
+  }
 }
 
 /*----------------------------------------------------------------------------------------------------------*/
@@ -671,6 +731,8 @@ void game_command_drop(Game *g)
 {
   Id space_id, object_id = NO_ID;
   char object_name[WORD_SIZE + 1];
+  BDTYPE buff_type = NO_TYPE, nerf_type = NO_TYPE;
+  Object *object = NULL;
   if (!g)
   {
     g->cmd_st = ERROR;
@@ -692,6 +754,13 @@ void game_command_drop(Game *g)
     return;
   }
 
+  object = game_get_object(g, object_id);
+  if (object == NULL)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
   if (player_hasObject(g->play, object_id) == FALSE)
   {
     g->cmd_st = ERROR;
@@ -700,70 +769,47 @@ void game_command_drop(Game *g)
 
   space_add_object(game_get_space(g, space_id), object_id);
   player_deleteObject(g->play, object_id);
+
+  buff_type = bd_getType(object_getBuff(object));
+  nerf_type = bd_getType(object_getNerf(object));
+
+  if(object_getIfConsumable(object) == FALSE) {
+    switch (buff_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) - bd_getValue(object_getBuff(object)));
+        break;
+  
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) - bd_getValue(object_getBuff(object)));
+        break;
+  
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) - bd_getValue(object_getBuff(object)));
+        break;
+  
+      default:
+        break;
+    }
+    
+    switch (nerf_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) - bd_getValue(object_getDebuff(object)));
+        break;
+  
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) - bd_getValue(object_getDebuff(object)));
+        break;
+  
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) - bd_getValue(object_getDebuff(object)));
+        break;
+  
+      default:
+        break;
+    }
+  }
 }
 
-/*---------------------------------------------------------------------------------------------------------*/
-
-/**
- * @brief If a or attack command it makes a combat between
- * @param game Pointer to structure Game
- * @return OK or ERROR
- */
-void game_command_attack(Game *g)
-{
-  int dmg, player_hp, enemy_hp;
-  Id player_loc, enemy_loc;
-
-  if (!g)
-  {
-    g->cmd_st = ERROR;
-    return;
-  }
-  g->description[0] = '\0';
-
-  player_loc = player_getLocation(g->play);
-  enemy_loc = enemy_getLocation(g->enemy[0]);
-  player_hp = player_getHealth(g->play);
-  enemy_hp = enemy_getHealth(g->enemy[0]);
-
-  if (player_loc != enemy_loc || enemy_hp<=0 )
-  {
-    g->cmd_st = ERROR;
-    return;
-  }
-
-  dmg = (rand() % 10);
-
-  if (dmg <= 4)
-  {
-    if (dmg == 0)
-    {
-      player_hp -= 2;
-    }
-    else
-    {
-      player_hp--;
-    }
-    player_setHealth(g->play, player_hp);
-  }
-  else
-  {
-    if (dmg == 9)
-    {
-      enemy_hp -= 2;
-    }
-    else
-    {
-      enemy_hp--;
-    }
-    enemy_setHealth(g->enemy[0], enemy_hp);
-  }
-
-  if (enemy_hp <= 0)
-  {
-    enemy_setLocation(g->enemy[0], NO_ID);
-  }
-}
 
 /*----------------------------------------------------------------------------------------------------------*/
 /**
@@ -794,8 +840,8 @@ void game_command_move(Game *g) {
   }
 
   scanf(" %c", &direction);
-  /*NORTH*/
-  if (direction == 'n' || direction == 'N') {
+  /*UP*/
+  if (direction == 'u' || direction == 'U') {
 
     if(player_isHere(g->play, 2, 1) == TRUE) {
       link_id = space_get_north(game_get_space(g, space_id));
@@ -858,8 +904,8 @@ void game_command_move(Game *g) {
       player_setPositionI(g->play, player_getPositionI(g->play) - 1);
     }
   }
-  /*SOUTH*/
-  else if (direction == 's' || direction == 'S') {
+  /*DOWN*/
+  else if (direction == 'd' || direction == 'D') {
     if(player_isHere(g->play, 2, 1)) {
       link_id = space_get_south(game_get_space(g, space_id));
       if (link_id != NO_ID) {
@@ -920,8 +966,8 @@ void game_command_move(Game *g) {
       player_setPositionI(g->play, player_getPositionI(g->play) + 1);
     }
   }
-  /*WEST*/
-  else if (direction == 'w' || direction == 'W') {
+  /*LEFT*/
+  else if (direction == 'l' || direction == 'L') {
 
     if(player_isHere(g->play, 1, 0)) {
       link_id = space_get_west(game_get_space(g, space_id));
@@ -983,8 +1029,8 @@ void game_command_move(Game *g) {
       player_setPositionJ(g->play, player_getPositionJ(g->play) - 1);
     }
   }
-  /*EAST*/
-  else if (direction == 'e' || direction == 'E') {
+  /*RIGHT*/
+  else if (direction == 'r' || direction == 'R') {
     if(player_isHere(g->play, 1, 2))  {
       link_id = space_get_east(game_get_space(g, space_id));
       if (link_id != NO_ID) {
@@ -1056,6 +1102,9 @@ void game_command_move(Game *g) {
 void game_command_inspect(Game *g) {
   Id object_id = NO_ID, p_loc = NO_ID;
   char name[WORD_SIZE + 1];
+  char aux[WORD_SIZE + 1];
+  BDTYPE buff_type = NO_TYPE, nerf_type = NO_TYPE;
+  Object *object = NULL;
    if (g == NULL)
   {
     g->cmd_st = ERROR;
@@ -1070,29 +1119,74 @@ void game_command_inspect(Game *g) {
       g->cmd_st = ERROR;
       return;
     }
-  if (strcmp(name, "s")==0||strcmp(name,"space")==0) {
-    strcpy(g->description, space_get_desc(game_get_space(g, p_loc)));
+  
+  object_id = _game_getObjectId_fromName(g, name);
+  if(object_id == NO_ID) {
+    g->cmd_st = ERROR;
+    return;
   }
-  else 
+
+  object = game_get_object(g, object_id);
+  if(object == NULL) {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  if ((object_isHere(object, player_getPositionI(g->play), player_getPositionJ(g->play)) == FALSE) && (player_hasObject(g->play, object_id) == FALSE))
   {
-    object_id = _game_getObjectId_fromName(g, name);
-    if(object_id == NO_ID) {
-      g->cmd_st = ERROR;
-      return;
-    }
+    g->cmd_st = ERROR;
+    return;
+  }
+  
+  strcpy(g->description, "You inspect the object %s:");
+   buff_type = bd_getType(object_getBuff(object));
+  nerf_type = bd_getType(object_getNerf(object));
 
-    if ((game_get_object_location(g, object_id) != p_loc) && (player_hasObject(g->play, object_id) == FALSE))
-    {
-      g->cmd_st = ERROR;
-      return;
-    }
+  switch (buff_type) {
+    case ATT:
+      sprintf(aux, WORD_SIZE," ATTACK +%.1f ", bd_getValue(object_getBuff(object)));
+      break;
 
-    strcpy(g->description, object_get_desc(game_get_object(g, object_id)));
+    case DEF:
+      sprintf(aux, WORD_SIZE," DEFENSE +%.1f ", bd_getValue(object_getBuff(object)));
+      break;
+
+    case HP:
+      sprintf(aux, WORD_SIZE," HEALTH +%.1f ", bd_getValue(object_getBuff(object)));
+      break;
+
+    default:
+      break;
+  }
+  
+  switch (nerf_type) {
+    case ATT:
+      sprintf(aux, WORD_SIZE," ATTACK -%.1f ", bd_getValue(object_getDebuff(object)));
+      break;
+
+    case DEF:
+      sprintf(aux, WORD_SIZE," DEFENSE -%.1f ", bd_getValue(object_getDebuff(object)));
+      break;
+
+    case HP:
+      sprintf(aux, WORD_SIZE," HEALTH -%.1f ", bd_getValue(object_getDebuff(object)));
+      break;
+
+    default:
+      break;
+  }
+
+  strcat(g->description, aux);
+
+  if(object_getIfConsumable(object) == TRUE) {
+    strcat(g->description, "It is consumable");
+  }
+  else {
+    strcat(g->description, "It is not consumable");
   }
 }
 
 /*----------------------------------------------------------------------------------------------------------*/
-
 /**
  * @brief If c or combat command it takes wether u would like to attack or protect from an enemy
  * @param game Pointer to structure Game
@@ -1160,7 +1254,7 @@ void game_command_combat(Game *g) {
       }
       else if(prob <= 8) {
         g->nerf_round = g->rounds + 2;
-        player_setDefense(g->play, player_getDefense(g->play) - 3);
+        player_setDefense(g->play, player_getDefense(g->play) - 5);
       }
     }
     if((strcmp(action, "protect") == 0) || (strcmp(action, "Protect") == 0) || (strcmp(action, "p") == 0) || (strcmp(action, "P") == 0)) {
@@ -1168,7 +1262,7 @@ void game_command_combat(Game *g) {
         g->attack_failed = TRUE;
       }
       else {
-        dmg = enemy_getAttack(enemy) - (3*player_getDefense(g->play));
+        dmg = enemy_getAttack(enemy) - (player_getDefense(g->play) + 7);
         if(dmg < 0) {
           dmg = 0;
         }
@@ -1188,6 +1282,7 @@ void game_command_combat(Game *g) {
       g->cmd_st = ERROR;
       return;
     }
+
     if((strcmp(action, "attack") == 0) || (strcmp(action, "Attack") == 0) || (strcmp(action, "a") == 0) || (strcmp(action, "A") == 0)) {
       if((prob = rand() % 15) <= 1) {
         g->attack_failed = TRUE;
@@ -1243,6 +1338,135 @@ void game_command_combat(Game *g) {
       g->cmd_st = ERROR;
       return;
     }
-
   }
 }
+
+/*----------------------------------------------------------------------------------------------------------*/
+/**
+ * @brief If u or use command it uses an object that the player has in the inventory
+ * @param game Pointer to structure Game
+ */
+void game_command_use(Game *g) {
+  Id space_id, object_id = NO_ID;
+  char object_name[WORD_SIZE + 1];
+  BDTYPE buff_type = NO_TYPE, nerf_type = NO_TYPE;
+  Object *object = NULL;
+  if (!g)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+  g->description[0] = '\0';
+
+  scanf(" %s", object_name);
+  space_id = game_get_player_location(g);
+  if (object_name[0] == '\0')
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  object_id = _game_getObjectId_fromName(g, object_name);
+  if(object_id == NO_ID) {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  object = game_get_object(g, object_id);
+  if (object == NULL)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  if (player_hasObject(g->play, object_id) == FALSE)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  player_deleteObject(g->play, object_id);
+
+  buff_type = bd_getType(object_getBuff(object));
+  nerf_type = bd_getType(object_getNerf(object));
+
+  if(object_getIfConsumable(object) == TRUE) {
+    switch (buff_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+  
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+  
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+  
+      default:
+        break;
+    }
+    
+    switch (nerf_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+  
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+  
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+  
+      default:
+        break;
+    }
+  }
+  else {
+    g->cmd_st = ERROR;
+    return;
+  }
+}
+
+/*----------------------------------------------------------------------------------------------------------*/
+/**
+ * @brief It activates the admin mode with the correct admin password:
+ * Admin <admin password> <YES/NO>
+ * @param game Pointer to structure Game
+ */
+ void game_command_admin(Game *g) {
+  char password[WORD_SIZE + 1], toggle[WORD_SIZE + 1];
+
+  if (!g)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+  scanf("%s", password);
+  if(strcmp(password, "Cumsitarios") == 0) {
+    scanf("%s", toggle);
+    if(strcmp(password, "YES") == 0) {
+      player_setHP(g->play, 1000);
+      player_setAttack(g->play, 1000);
+      player_setDefense(g->play, 1000);
+      player_setXP(g->play, 1000);
+    }
+    else if(strcmp(password, "NO") == 0) {
+      player_setHealth(g->play, 25);
+      player_setAttack(g->play, 1);
+      player_setDefense(g->play, 0);
+      player_setXP(g->play, 0);
+    }
+    else {
+      g->cmd_st = ERROR;
+      return;
+    }
+  }
+  else {
+    g->cmd_st = ERROR;
+    return;
+  }
+ }
