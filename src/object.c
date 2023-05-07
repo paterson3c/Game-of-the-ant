@@ -237,7 +237,7 @@ BDTYPE object_getBuffType(Object *object)
 {
     if (!object)
     {
-        return NULL;
+        return Unkown;
     }
     return bd_getType(object->buff);
 }
@@ -246,7 +246,7 @@ BDTYPE object_getDebuffType(Object *object)
 {
     if (!object)
     {
-        return NULL;
+        return Unkown;
     }
     return bd_getType(object->debuff);
 }
@@ -298,7 +298,7 @@ BD *object_getBuff(Object *object)
 {
     if (!object)
     {
-        return NULL;
+        return Unkown;
     }
     return object->buff;
 }
@@ -307,7 +307,7 @@ BD *object_getDebuff(Object *object)
 {
     if (!object)
     {
-        return NULL;
+        return Unkown;
     }
 
     return object->debuff;

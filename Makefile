@@ -22,7 +22,10 @@ OBJS = $(OBJ_DIR)/game.o \
 	   $(OBJ_DIR)/inventory.o \
 	   $(OBJ_DIR)/buff_debuff.o \
 	   $(OBJ_DIR)/xp.o \
-	   $(OBJ_DIR)/link.o
+	   $(OBJ_DIR)/link.o \
+	   $(OBJ_DIR)/main_test.o \
+
+
 
 .PHONY: run runv clean clear test doc
 

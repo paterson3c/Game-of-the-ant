@@ -35,7 +35,7 @@ Enemy *_game_get_enemy_fromPlayer_location(Game *game) {
   Enemy *enemy = NULL;
 
   while ((game->enemy[i] < MAX_ENEMY) && !found) {
-    if (enemy_get_location(game->enemy[i]) == player_get_location(game->play)) {
+    if (enemy_getLocation(game->enemy[i]) == player_getLocation(game->play)) {
       found = TRUE;
       enemy = game->enemy[i];
     }
@@ -681,7 +681,7 @@ void game_command_take(Game *g)
   player_addObject(g->play, object_id);
 
   buff_type = bd_getType(object_getBuff(object));
-  nerf_type = bd_getType(object_getNerf(object));
+  nerf_type = bd_getType(object_getDebuff(object));
 
   if(object_getIfConsumable(object) == FALSE) {
     switch (buff_type) {
@@ -771,7 +771,7 @@ void game_command_drop(Game *g)
   player_deleteObject(g->play, object_id);
 
   buff_type = bd_getType(object_getBuff(object));
-  nerf_type = bd_getType(object_getNerf(object));
+  nerf_type = bd_getType(object_getDebuff(object));
 
   if(object_getIfConsumable(object) == FALSE) {
     switch (buff_type) {
@@ -1140,7 +1140,7 @@ void game_command_inspect(Game *g) {
   
   strcpy(g->description, "You inspect the object %s:");
    buff_type = bd_getType(object_getBuff(object));
-  nerf_type = bd_getType(object_getNerf(object));
+  nerf_type = bd_getType(object_getDebuff(object));
 
   switch (buff_type) {
     case ATT:
@@ -1388,7 +1388,7 @@ void game_command_use(Game *g) {
   player_deleteObject(g->play, object_id);
 
   buff_type = bd_getType(object_getBuff(object));
-  nerf_type = bd_getType(object_getNerf(object));
+  nerf_type = bd_getType(object_getDebuff(object));
 
   if(object_getIfConsumable(object) == TRUE) {
     switch (buff_type) {
@@ -1449,7 +1449,7 @@ void game_command_use(Game *g) {
   if(strcmp(password, "Cumsitarios") == 0) {
     scanf("%s", toggle);
     if(strcmp(password, "YES") == 0) {
-      player_setHP(g->play, 1000);
+      player_setHealth(g->play, 1000);
       player_setAttack(g->play, 1000);
       player_setDefense(g->play, 1000);
       player_setXP(g->play, 1000);
