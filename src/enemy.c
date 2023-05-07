@@ -10,11 +10,13 @@
 
 struct _Enemy
 {
-    Id id;                    /*Structure enemy's id*/
-    char name[WORD_SIZE + 1]; /*Enemy's name*/
-    Id location;              /*Where the enemy is*/
-    int health;               /*Health of te enemy*/
-    BOOL position[3][3];       /*Enemy's position*/
+    Id id;                      /*Structure enemy's id*/
+    char name[WORD_SIZE + 1];   /*Enemy's name*/
+    Id location;                /*Where the enemy is*/
+    int health;                 /*Health of te enemy*/
+    BOOL position[3][3];        /*Enemy's position*/
+    float attack;               /*Enemy's attack*/
+    float defense;              /*Enemy's defense*/
 };
 
 /*----------------------------------------------------------------------------------------------------*/
@@ -165,5 +167,39 @@ STATUS enemy_resetPosition(Enemy *p) {
             p->position[i][j] = FALSE;
         }
     }
+    return OK;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+float enemy_getAttack(Enemy *e) {
+    if(!e)
+        return -1;
+    
+    return e->attack;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+STATUS enemy_setAttack(Enemy *e, float a) {
+    if(!e || a<0)
+        return ERROR;
+    
+    e->attack = a;
+    return OK;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+float enemy_getDefense(Enemy *e) {
+    if(!e)
+        return -1;
+    
+    return e->defense;
+}
+
+/*----------------------------------------------------------------------------------------------------*/
+STATUS enemy_setDefense(Enemy *e, float d) {
+    if(!e || d<0)
+        return ERROR;
+    
+    e->defense = d;
     return OK;
 }

@@ -47,6 +47,12 @@ enemy_test: $(OBJ_DIR)/enemy_test.o $(OBJ_DIR)/enemy.o
 inventory_test: $(OBJ_DIR)/inventory_test.o $(OBJ_DIR)/inventory.o 
 	$(CC) -o inventory_test $(OBJ_DIR)/inventory_test.o $(OBJ_DIR)/inventory.o $(OBJ_DIR)/set.o $(LIB_DIR)/libscreen.a
 
+buff_debuff_test: $(OBJ_DIR)/buff_debuff_test.o $(OBJ_DIR)/buff_debuff.o 
+	$(CC) -o buff_debuff_test $(OBJ_DIR)/buff_debuff_test.o $(OBJ_DIR)/buff_debuff.o $(LIB_DIR)/libscreen.a
+
+xp_test: $(OBJ_DIR)/xp_test.o $(OBJ_DIR)/xp.o
+	$(CC) -o xp_test $(OBJ_DIR)/xp_test.o $(OBJ_DIR)/xp.o $(LIB_DIR)/libscreen.a
+
 $(DOC_DIR)/Doxyfile:
 	doxygen -g $@
 

@@ -13,7 +13,7 @@
 #include "types.h"
 
 #define N_CMDT 2
-#define N_CMD 12 /*max number of commands*/
+#define N_CMD 9 /*max number of commands*/
 
 typedef enum enum_CmdType {
   CMDS,
@@ -25,18 +25,15 @@ typedef enum enum_CmdType {
  * 
 */
 typedef enum enum_Command {
-  NO_CMD = -1, /*no imput*/ 
-  UNKNOWN, /*command not recognized*/ 
-  EXIT,   /*exit the game*/
-  NEXT,   /*next location*/
-  BACK,   /*back location*/
-  LEFT,   /*left location*/
-  RIGHT,   /*right location*/
-  TAKE,   /*take the object*/
-  DROP,   /*drop the object*/
-  ATTACK,  /*attack the enemie and the */
-  MOVE,   /*move the player*/
-  INSPECT /*inspect the object or the space*/
+  NO_CMD = -1,  /*no imput*/ 
+  UNKNOWN,      /*command not recognized*/ 
+  EXIT,         /*exit the game*/
+  TAKE,         /*take the object*/
+  DROP,         /*drop the object*/
+  ATTACK,       /*attack the enemie and the */
+  MOVE,         /*move the player*/
+  INSPECT,      /*inspect the object or the space*/
+  COMBAT,       /*combat with the enemie*/
 } T_Command;
 
 /**

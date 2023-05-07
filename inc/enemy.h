@@ -125,4 +125,34 @@ STATUS enemy_resetPosition(Enemy *p);
 */
 int enemy_print(Enemy *e);
 
+/**
+ * @brief It gives the Enemy's attack.
+ * @param e Pointer to structure Enemy.
+ * @return returns the Enemy's attack, else, it returns -1.
+*/
+float enemy_getAttack(Enemy *e);
+
+/**
+ * @brief It changes the Enemy's attack.
+ * @param e Pointer to structure Enemy.
+ * @param a new attack.
+ * @return returns OK if it runned without errors, else, it returns ERROR.
+*/
+STATUS enemy_setAttack(Enemy *e, float a);
+
+/**
+ * @brief It gives the Enemy's defense.
+ * @param e Pointer to structure Enemy.
+ * @return returns the Enemy's defense, else, it returns -1.
+*/
+float enemy_getDefense(Enemy *e);
+
+/**
+ * @brief It changes the Enemy's defense.
+ * @param e Pointer to structure Enemy.
+ * @param d new defense.
+ * @return returns OK if it runned without errors, else, it returns ERROR.
+*/
+STATUS enemy_setDefense(Enemy *e, float d);
+
 #endif

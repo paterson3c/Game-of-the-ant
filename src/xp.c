@@ -63,7 +63,7 @@ STATUS xp_setXp(XP *xp, int value)
 
 STATUS xp_setLevel(XP *xp, int value)
 {
-    if (!xp || value < 0)
+    if (!xp || value < 0 || value > xp->maxLevel)
     {
         return ERROR;
     }

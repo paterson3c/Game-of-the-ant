@@ -350,7 +350,7 @@ STATUS player_setPositionI(Player *p, int i) {
     if(!p || i<0 || i>2)
         return ERROR;
     
-    if(player_setPosition(p, i, Player_getPositionJ(p)) == ERROR)
+    if(player_setPosition(p, i, player_getPositionJ(p)) == ERROR)
         return ERROR;
 
     return OK;

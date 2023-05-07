@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "link.h"
+#include "types.h"
 
 /**
  * @brief Stores all the information of a link.

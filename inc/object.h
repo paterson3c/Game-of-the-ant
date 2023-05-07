@@ -97,14 +97,22 @@ BOOL object_getIfConsumable(Object* object);
 STATUS object_setIfConsumable(Object* object, BOOL consumable);
 
 
-BD *object_getBD(Object *object);
+BD *object_getBuff(Object *object);
+
+BD *object_getDebuff(Object *object);
 
 
-STATUS object_setBD(Object *object, BD *bd);
+STATUS object_setBuff(Object *object, BD *bd);
 
-STATUS object_setBDValue(Object *object, float value);
+STATUS object_setDebuff(Object *object, BD *bd);
 
-STATUS object_setBDType(Object *object, BDTYPE type);
+STATUS object_setBuffValue(Object *object, float value);
+
+STATUS object_setDebuffValue(Object *object, float value);
+
+STATUS object_setBuffType(Object *object, BDTYPE type);
+
+STATUS object_setDebuffType(Object *object, BDTYPE type);
 
 /**
  * @brief It sets the Player's position.

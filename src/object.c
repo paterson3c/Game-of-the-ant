@@ -15,7 +15,8 @@ struct _Object
     char description[235];      /*!< Description of the object */
     BOOL consumable;            /*!< If the object is consumable or not */
     int type;                   /*!< Type of the object (1 = common, 2 = rare, 3 = epic, 4 = legendary) */
-    BD *bd;                     /*!< Buffs and debuffs of the object */
+    BD *buff;                   /*!< Buffs of the object */
+    BD *debuff;                 /*!< Debuffs of the object */
     int position[3][3];         /*!< Position of the object */
 };
 
@@ -43,7 +44,8 @@ Object *object_create(Id id)
     newObject->name[0] = '\0';
     newObject->consumable = FALSE;
     newObject->type = 0;
-    newObject->bd = NULL;
+    newObject->buff = NULL;
+    newObject->debuff = NULL;
 
     return newObject;
 }
@@ -256,13 +258,23 @@ STATUS object_setType(Object *object, BDTYPE type)
  * 
  * @return a pointer to the buff/debuff attribute of the object
 */
-BD *object_getBD(Object *object)
+BD *object_getBuff(Object *object)
 {
     if (!object)
     {
         return NULL;
     }
-    return object->bd;
+    return object->buff;
+}
+
+BD *object_getDebuff(Object *object)
+{
+    if (!object)
+    {
+        return NULL;
+    }
+
+    return object->debuff;
 }
 
 /**
@@ -273,24 +285,34 @@ BD *object_getBD(Object *object)
  * 
  * @return OK if everything goes well, ERROR if there was some mistake
 */
-STATUS object_setBD(Object *object, BD *bd)
+STATUS object_setBuff(Object *object, BD *buff)
 {
     if (!object)
     {
         return ERROR;
     }
-    object->bd = bd;
+    object->buff = buff;
     return OK;
 }
 
-STATUS object_setBDValue(Object *object, float value) 
+STATUS object_setDebuff(Object *object, BD *debuff)
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    object->debuff = debuff;
+    return OK;
+}
+
+STATUS object_setBuffValue(Object *object, float value) 
 {
     if (!object)
     {
         return ERROR;
     }
     
-    if(!bd_setValue(object->bd, value))
+    if(!bd_setValue(object->buff, value))
     {
         return ERROR;
     }
@@ -298,14 +320,44 @@ STATUS object_setBDValue(Object *object, float value)
     return OK;
 }
 
-STATUS object_setBDType(Object *object, BDTYPE type) 
+STATUS object_setDebuffValue(Object *object, float value) 
 {
     if (!object)
     {
         return ERROR;
     }
     
-    if(!bd_setType(object->bd, type))
+    if(!bd_setValue(object->debuff, value))
+    {
+        return ERROR;
+    }
+
+    return OK;
+}
+
+STATUS object_setBuffType(Object *object, BDTYPE type) 
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    
+    if(!bd_setType(object->buff, type))
+    {
+        return ERROR;
+    }
+
+    return OK;
+}
+
+STATUS object_setDebuffType(Object *object, BDTYPE type) 
+{
+    if (!object)
+    {
+        return ERROR;
+    }
+    
+    if(!bd_setType(object->debuff, type))
     {
         return ERROR;
     }

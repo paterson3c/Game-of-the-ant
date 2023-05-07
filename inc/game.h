@@ -26,14 +26,20 @@
 #include "link.h"
 
 typedef struct _Game {
-  Player *play; /*Pointer to Player*/
-  Enemy *enemy[MAX_ENEMY]; /*Pointer to Enemys*/ 
+  Player *play;                 /*Pointer to Player*/
+  Enemy *enemy[MAX_ENEMY];      /*Pointer to Enemys*/ 
   Object *objects[MAX_OBJECTS]; /*Pointer to Objects*/
-  Space *spaces[MAX_SPACES]; /*Pointer to spaces*/
-  Link *links[MAX_LINKS]; /*Pointer to links*/
-  char description[MAX_S]; /*String of the inspect space/object*/
-  T_Command last_cmd; /*Structure commands*/
-  STATUS cmd_st; /*Command Status*/
+  Space *spaces[MAX_SPACES];    /*Pointer to spaces*/
+  Link *links[MAX_LINKS];       /*Pointer to links*/
+  char description[MAX_S];      /*String of the inspect space/object*/
+  T_Command last_cmd;           /*Structure commands*/
+  STATUS cmd_st;                /*Command Status*/
+  int rounds;                   /*Number of rounds*/
+  int attack_round;             /*Round to attack*/
+  int buff_round;               /*Round to buff*/
+  int nerf_round;               /*Round to nerf*/
+  BOOL attack_failed;           /*True if player attack failed*/
+  BOOL attack_critical;         /*True if player attack critical*/
 } Game;
 
 
