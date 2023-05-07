@@ -30,66 +30,61 @@ STATUS game_create_from_file(Game *game, char *filename) {
 
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-STATUS game_load_spaces(Game *game, char *filename) {
+STATUS game_load_spaces(Game *game, char *filename)
+{
   FILE *file = NULL;
   char line[WORD_SIZE] = "";
   char name[WORD_SIZE] = "";
-  char descrpit1[WORD_SIZE] = "", descrpit2[WORD_SIZE] = "", descrpit3[WORD_SIZE] = "", descrpit4[WORD_SIZE] = "", descrpit5[WORD_SIZE] = "";
   char *toks = NULL;
+  int nlines = 0;
   Id id = NO_ID;
   Space *space = NULL;
   STATUS status = OK;
 
-  if (!filename) {
+  if (!filename)
+  {
     return ERROR;
   }
 
   file = fopen(filename, "r");
-  if (file == NULL) {
+  if (file == NULL)
+  {
     return ERROR;
   }
 
-  while (fgets(line, WORD_SIZE, file)) {
-    if (strncmp("#s:", line, 3) == 0) {
+  while (fgets(line, WORD_SIZE, file))
+  {
+    if (strncmp("#s:", line, 3) == 0)
+    {
       toks = strtok(line + 3, "|");
       id = atol(toks);
       toks = strtok(NULL, "|");
       strcpy(name, toks);
       toks = strtok(NULL, "|");
-      strcpy(descrpit1, toks);
-      toks = strtok(NULL, "|");
-      strcpy(descrpit2, toks);
-      toks = strtok(NULL, "|");
-      strcpy(descrpit3, toks);
-      toks = strtok(NULL, "|");
-      strcpy(descrpit4, toks);
-      toks = strtok(NULL, "|");
-      strcpy(descrpit5, toks);
-      toks = strtok(NULL, "|");
+      nlines = atoi(toks);
 
 #ifdef DEBUG
-      printf("Leido: %ld|%s|%s|%s|%s|%s|%s|%s\n", id, name, descrpit1, descrpit2, descrpit3, descrpit4, descrpit5, desc);
+      printf("Leido: %ld|%s|%s|%d\n", id, name, desc, nlines);
 #endif
       space = space_create(id);
-      if (space != NULL) {
+      if (space != NULL)
+      {
         space_set_name(space, name);
         space_set_desc(space, name);
-        printf("Name: %s ", name);
-        printf("Name_taken: %s ", space_get_name(space));
-        printf("Desc_taken: %s ", space_get_desc(space));
-        
-        space_set_gdesc(space, descrpit1, 0);
-        space_set_gdesc(space, descrpit2, 1);
-        space_set_gdesc(space, descrpit3, 2);
-        space_set_gdesc(space, descrpit4, 3);
-        space_set_gdesc(space, descrpit5, 4);
-  
+        space_set_nlines(space, nlines);
+        for (int i = 0; i < nlines; i++)
+        {  
+          fgets(line, WORD_SIZE, file);
+          line[strlen(line)-1] = '\0';
+          space_set_gdesc(space, line, i);
+        }
         game_add_space(game, space);
       }
     }
   }
 
-  if (ferror(file)) {
+  if (ferror(file))
+  {
     status = ERROR;
   }
 
