@@ -35,4 +35,11 @@ typedef enum {
   W
 } DIRECTION;
 
+typedef enum {
+  NO_TYPE,
+  ATT,
+  DEF,
+  HP
+} BDTYPE;
+
 #endif

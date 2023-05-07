@@ -42,10 +42,8 @@ STATUS game_load_spaces(Game *game, char *filename)
   FILE *file = NULL;
   char line[WORD_SIZE] = "";
   char name[WORD_SIZE] = "";
-  char desc[WORD_SIZE] = "";
   char *toks = NULL;
   int nlines = 0;
-  int i = 0;
   Id id = NO_ID;
   Space *space = NULL;
   STATUS status = OK;
@@ -70,8 +68,6 @@ STATUS game_load_spaces(Game *game, char *filename)
       toks = strtok(NULL, "|");
       strcpy(name, toks);
       toks = strtok(NULL, "|");
-      strcpy(desc, toks);
-      toks = strtok(NULL, "|");
       nlines = atoi(toks);
 
 #ifdef DEBUG
@@ -81,15 +77,15 @@ STATUS game_load_spaces(Game *game, char *filename)
       if (space != NULL)
       {
         space_set_name(space, name);
-        space_set_desc(space, desc);
+        space_set_desc(space, name);
         space_set_nlines(space, nlines);
-        game_add_space(game, space);
-
         for (int i = 0; i < nlines; i++)
-        {
+        {  
           fgets(line, WORD_SIZE, file);
+          line[strlen(line)-1] = '\0';
           space_set_gdesc(space, line, i);
         }
+        game_add_space(game, space);
       }
     }
   }
@@ -282,6 +278,7 @@ STATUS game_load_enemy(Game *game, char *filename)
         enemy_setId(enemy, id);
         enemy_setName(enemy, name);
         enemy_setLocation(enemy, id_loc);
+        space_set_enemy(game_get_space(game, id_loc), enemy);
         enemy_setHealth(enemy, health);
         game_add_enemy(game, enemy);
       }

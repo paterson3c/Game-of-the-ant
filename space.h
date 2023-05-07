@@ -14,6 +14,7 @@
 #include "types.h"
 #include "object.h"
 #include "set.h"
+#include "enemy.h"
 
 typedef struct _Space Space;
 
@@ -256,5 +257,9 @@ STATUS space_set_nlines(Space *space, int n);
   * @return the number of lines or -1 in case of ERROR
   */
 int space_get_nlines(Space *space);
+
+
+Enemy *space_get_enemy(Space *space);
+STATUS space_set_enemy(Space *space, Enemy *enemy);
 
 #endif

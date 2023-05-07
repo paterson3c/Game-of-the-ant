@@ -27,9 +27,10 @@ struct _Space
   Id east;                  /*!< Id of the space at the east */
   Id west;                  /*!< Id of the space at the west */
   Set *objects;             /*!< Object for the space */
-  char gdesc[50][100];      /*!< Graphic description of the space*/
+  char gdesc[30][100];      /*!< Graphic description of the space*/
   char description[235];    /*!< Description of the object */
   int nlines;
+  Enemy *enemy;
 };
 
 /** space_create allocates memory for a new space
@@ -278,7 +279,7 @@ Id *space_get_objects(Space *space)
   if (!space)
     return NULL;
 
-  ids = set_get_ids(space->objects);
+  ids = set_get_ids(space_get_set(space));
 
   return ids;
 }
@@ -385,3 +386,23 @@ int space_get_nlines(Space *space)
 
   return space->nlines;
 }
+
+Enemy *space_get_enemy(Space *space)
+{
+  if(!space)
+    return NULL;
+  
+  return space->enemy;
+}
+
+STATUS space_set_enemy(Space *space, Enemy *enemy)
+{
+  if(!space || !enemy)
+    return ERROR;
+  
+  space->enemy = enemy;
+
+  return OK;
+}
+
+
