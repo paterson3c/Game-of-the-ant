@@ -21,15 +21,28 @@
 
 void game_command_unknown(Game *game);
 void game_command_exit(Game *game);
-void game_command_next(Game *game);
-void game_command_back(Game *game);
-void game_command_right(Game *game);
-void game_command_left(Game *game);
 void game_command_take(Game *game);
 void game_command_drop(Game *game);
-void game_command_attack(Game *game);
 void game_command_move(Game *game);
 void game_command_inspect(Game *game);
+void game_command_combat(Game *game);
+void game_command_use(Game *game);
+void game_command_admin(Game *game);
+
+Enemy *_game_get_enemy_fromPlayer_location(Game *game) {
+  int i = 0;
+  BOOL found = FALSE;
+  Enemy *enemy = NULL;
+
+  while ((game->enemy[i] < MAX_ENEMY) && !found) {
+    if (enemy_getLocation(game->enemy[i]) == player_getLocation(game->play)) {
+      found = TRUE;
+      enemy = game->enemy[i];
+    }
+    i++;
+  }
+  return enemy;
+}
 
 Id _game_getObjectId_fromName(Game *game, char *name) {
   int i = 0;
@@ -82,6 +95,7 @@ STATUS game_create(Game *game)
   game->play = NULL;
   game->last_cmd = NO_CMD;
   game->description[0] = '\0';
+  game->rounds = 0;
 
   srand(time(NULL));
 
@@ -486,6 +500,14 @@ STATUS game_update(Game *game, T_Command cmd)
 {
   game->last_cmd = cmd;
   game->cmd_st = OK;
+  game->rounds++;
+  game->attack_failed = FALSE;
+  game->attack_critical = FALSE;
+  if (game->rounds == game->nerf_round) {
+    player_setDefense(game->play, player_getDefense(game->play) + 5);
+    game->nerf_round = 0;
+  }
+  game->description[0] = '\0';
 
   switch (cmd)
   {
@@ -497,22 +519,6 @@ STATUS game_update(Game *game, T_Command cmd)
     game_command_exit(game);
     break;
 
-  case NEXT:
-    game_command_next(game);
-    break;
-
-  case BACK:
-    game_command_back(game);
-    break;
-
-  case RIGHT:
-    game_command_right(game);
-    break;
-
-  case LEFT:
-    game_command_left(game);
-    break;
-
   case TAKE:
     game_command_take(game);
     break;
@@ -521,8 +527,8 @@ STATUS game_update(Game *game, T_Command cmd)
     game_command_drop(game);
     break;
 
-  case ATTACK:
-    game_command_attack(game);
+  case USE:
+    game_command_use(game);
     break;
 
   case MOVE:
@@ -531,6 +537,14 @@ STATUS game_update(Game *game, T_Command cmd)
 
   case INSPECT:
     game_command_inspect(game);
+    break;
+
+  case COMBAT:
+    game_command_combat(game);
+    break;
+  
+  case ADMIN:
+    game_command_admin(game);
     break;
 
   default:
@@ -617,309 +631,6 @@ void game_command_exit(Game *game)
 /*----------------------------------------------------------------------------------------------------------*/
 
 /**
- * @brief If n or next command it moves the player move to the next space
- * @param game Pointer to structure Game
- * @return OK or ERROR
- */
-void game_command_next(Game *g)
-{
-  Id current_id = NO_ID;
-  Id space_id = NO_ID, link_id = NO_ID, req = NO_ID, aux = NO_ID;
-  long first_digit = 0;
-
-  space_id = game_get_player_location(g);
-  g->description[0] = '\0';
-
-  if (NO_ID == space_id)
-  { 
-    printf("Error 0");
-    g->cmd_st = ERROR;
-    return;
-  }
-
-  link_id = space_get_south(game_get_space(g, space_id));
-    if (link_id != NO_ID) {
-      if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
-        aux = req = link_getRequirement(game_get_link(g, link_id));
-        while (aux != 0) {
-            first_digit = aux % 10;
-            aux /= 10;
-        }
-        if (first_digit == 2) {
-          if(player_hasObject(g->play, req) == TRUE) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
-          }
-          else { 
-            fprintf(stdout, "You need to have the object %s to open this door\n", object_get_name(game_get_object(g, req)));
-            g->cmd_st = ERROR;
-            return;
-          }
-        }
-        else if(first_digit == 4) {
-          
-          if(enemy_getHealth(game_get_enemy(g, req)) == 0) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
-          }
-          else {
-            fprintf(stdout, "You need to kill the enemy %s to open this door\n", enemy_getName(game_get_enemy(g, req)));
-            g->cmd_st = ERROR;
-            return;
-          }
-        }
-        else {
-          printf("Error 4");
-          g->cmd_st = ERROR;
-          return;
-        }
-      }
-      if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
-        if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
-          printf("Error 5");
-          g->cmd_st = ERROR;
-          return;
-        }
-        else
-          player_setLocation(g->play, current_id);
-      }
-    }
-    else {
-      printf("Error 6");
-      g->cmd_st = ERROR;
-      return;
-    }
-}
-
-/*----------------------------------------------------------------------------------------------------------*/
-
-/**
- * @brief If b or back command it makes the player move to the previous space
- * @param game Pointer to structure Game
- * @return OK or ERROR
- */
-void game_command_back(Game *g)
-{
-  Id current_id = NO_ID;
-  Id space_id = NO_ID, link_id = NO_ID, req = NO_ID, aux = NO_ID;
-  long first_digit = 0;
-
-  space_id = game_get_player_location(g);
-  g->description[0] = '\0';
-
-  if (NO_ID == space_id)
-  { 
-    printf("Error 0");
-    g->cmd_st = ERROR;
-    return;
-  }
-
-  link_id = space_get_north(game_get_space(g, space_id));
-    link_print(game_get_link(g, link_id));
-    printf("\n");
-    if (link_id != NO_ID) {
-      if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
-        aux = req = link_getRequirement(game_get_link(g, link_id));
-        while (aux != 0) {
-            first_digit = aux % 10;
-            aux /= 10;
-        }
-        if (first_digit == 2) {
-          if(player_hasObject(g->play, req) == TRUE) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
-          }
-          else { 
-            fprintf(stdout, "You need to have the object %s to open this door", object_get_name(game_get_object(g, req)));
-            g->cmd_st = ERROR;
-            return;
-          }
-        }
-        else if(first_digit == 4) {
-          if(enemy_getHealth(game_get_enemy(g, req)) <= 0) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
-          }
-          else {
-            fprintf(stdout, "You need to kill the enemy %s to open this door", enemy_getName(game_get_enemy(g, req)));
-            g->cmd_st = ERROR;
-            return;
-          }
-        }
-        else {
-          printf("Error 1");
-          g->cmd_st = ERROR;
-          return;
-        }
-      }
-      if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
-        if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
-          printf("Error 5");
-          g->cmd_st = ERROR;
-          return;
-        }
-        else
-          player_setLocation(g->play, current_id);
-      }
-    }
-    else {
-      printf("Error 3");
-      g->cmd_st = ERROR;
-      return;
-    }
-}
-
-/*----------------------------------------------------------------------------------------------------------*/
-
-/**
- * @brief If r or right command it makes the player move to the right space
- * @param game Pointer to structure Game
- * @return OK or ERROR
- */
-void game_command_right(Game *g)
-{
-  Id current_id = NO_ID;
-  Id space_id = NO_ID, link_id = NO_ID, req = NO_ID, aux = NO_ID;
-  long first_digit = 0;
-
-  space_id = game_get_player_location(g);
-  g->description[0] = '\0';
-
-  if (NO_ID == space_id)
-  { 
-    printf("Error 0");
-    g->cmd_st = ERROR;
-    return;
-  }
-
-  link_id = space_get_east(game_get_space(g, space_id));
-    link_print(game_get_link(g, link_id));
-    printf("\n");
-    if (link_id != NO_ID) {
-      if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
-        aux = req = link_getRequirement(game_get_link(g, link_id));
-        while (aux != 0) {
-            first_digit = aux % 10;
-            aux /= 10;
-        }
-        if (first_digit == 2) {
-          if(player_hasObject(g->play, req) == TRUE) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
-          }
-          else { 
-            fprintf(stdout, "You need to have the object %s to open this door", object_get_name(game_get_object(g, req)));
-            g->cmd_st = ERROR;
-            return;
-          }
-        }
-        else if(first_digit == 4) {
-          if(enemy_getHealth(game_get_enemy(g, req)) <= 0) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
-          }
-          else {
-            fprintf(stdout, "You need to kill the enemy %s to open this door", enemy_getName(game_get_enemy(g, req)));
-            g->cmd_st = ERROR;
-            return;
-          }
-        }
-        else {
-          printf("Error 10");
-          g->cmd_st = ERROR;
-          return;
-        }
-      }
-      if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
-        if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
-          printf("Error 5");
-          g->cmd_st = ERROR;
-          return;
-        }
-        else
-          player_setLocation(g->play, current_id);
-      }
-    }
-    else {
-      printf("Error 12");
-      g->cmd_st = ERROR;
-      return;
-    }
-}
-
-/*----------------------------------------------------------------------------------------------------------*/
-
-/**
- * @brief If l or left command it makes the player move to the right space
- * @param game Pointer to structure Game
- * @return OK or ERROR
- */
-void game_command_left(Game *g)
-{
-  Id current_id = NO_ID;
-  Id space_id = NO_ID, link_id = NO_ID, req = NO_ID, aux = NO_ID;
-  long first_digit = 0;
-
-  space_id = game_get_player_location(g);
-  g->description[0] = '\0';
-
-  if (NO_ID == space_id)
-  { 
-    printf("Error 0");
-    g->cmd_st = ERROR;
-    return;
-  }
-
-  link_id = space_get_west(game_get_space(g, space_id));
-    link_print(game_get_link(g, link_id));
-    printf("\n");
-    if (link_id != NO_ID) {
-      if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
-        aux = req = link_getRequirement(game_get_link(g, link_id));
-        while (aux != 0) {
-            first_digit = aux % 10;
-            aux /= 10;
-        }
-        if (first_digit == 2) {
-          if(player_hasObject(g->play, req) == TRUE) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
-          }
-          else { 
-            fprintf(stdout, "You need to have the object %s to open this door", object_get_name(game_get_object(g, req)));
-            g->cmd_st = ERROR;
-            return;
-          }
-        }
-        else if(first_digit == 4) {
-          if(enemy_getHealth(game_get_enemy(g, req)) <= 0) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
-          }
-          else {
-            fprintf(stdout, "You need to kill the enemy %s to open this door", enemy_getName(game_get_enemy(g, req)));
-            g->cmd_st = ERROR;
-            return;
-          }
-        }
-        else {
-          printf("Error 7");
-          g->cmd_st = ERROR;
-          return;
-        }
-      }
-      if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
-        if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
-          printf("Error 5");
-          g->cmd_st = ERROR;
-          return;
-        }
-        else
-          player_setLocation(g->play, current_id);
-      }
-    }
-    else {
-      printf("Error 9");
-      g->cmd_st = ERROR;
-      return;
-    }
-}
-
-/*----------------------------------------------------------------------------------------------------------*/
-
-/**
  * @brief If t or take command it makes the player take the object
  * @param game Pointer to structure Game
  * @return OK or ERROR
@@ -928,6 +639,9 @@ void game_command_take(Game *g)
 {
   Id space_id, object_id = NO_ID;
   char object_name[WORD_SIZE + 1];
+  BDTYPE buff_type = NO_TYPE, nerf_type = NO_TYPE;
+  Object *object = NULL;
+
 
   if (g == NULL)
   {
@@ -950,6 +664,13 @@ void game_command_take(Game *g)
     return;
   }
 
+  object = game_get_object(g, object_id);
+  if (object == NULL)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
   if ((game_get_object_location(g, object_id) != space_id) || (space_has_object(game_get_space(g, space_id), object_id) == FALSE))
   {
     g->cmd_st = ERROR;
@@ -958,6 +679,45 @@ void game_command_take(Game *g)
 
   space_delete_object(game_get_space(g, space_id), object_id);
   player_addObject(g->play, object_id);
+
+  buff_type = bd_getType(object_getBuff(object));
+  nerf_type = bd_getType(object_getDebuff(object));
+
+  if(object_getIfConsumable(object) == FALSE) {
+    switch (buff_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+
+      default:
+        break;
+    }
+
+    switch (nerf_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+
+      default:
+        break;
+    }
+  }
 }
 
 /*----------------------------------------------------------------------------------------------------------*/
@@ -971,6 +731,8 @@ void game_command_drop(Game *g)
 {
   Id space_id, object_id = NO_ID;
   char object_name[WORD_SIZE + 1];
+  BDTYPE buff_type = NO_TYPE, nerf_type = NO_TYPE;
+  Object *object = NULL;
   if (!g)
   {
     g->cmd_st = ERROR;
@@ -992,6 +754,13 @@ void game_command_drop(Game *g)
     return;
   }
 
+  object = game_get_object(g, object_id);
+  if (object == NULL)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
   if (player_hasObject(g->play, object_id) == FALSE)
   {
     g->cmd_st = ERROR;
@@ -1000,79 +769,54 @@ void game_command_drop(Game *g)
 
   space_add_object(game_get_space(g, space_id), object_id);
   player_deleteObject(g->play, object_id);
+
+  buff_type = bd_getType(object_getBuff(object));
+  nerf_type = bd_getType(object_getDebuff(object));
+
+  if(object_getIfConsumable(object) == FALSE) {
+    switch (buff_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) - bd_getValue(object_getBuff(object)));
+        break;
+  
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) - bd_getValue(object_getBuff(object)));
+        break;
+  
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) - bd_getValue(object_getBuff(object)));
+        break;
+  
+      default:
+        break;
+    }
+    
+    switch (nerf_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) - bd_getValue(object_getDebuff(object)));
+        break;
+  
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) - bd_getValue(object_getDebuff(object)));
+        break;
+  
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) - bd_getValue(object_getDebuff(object)));
+        break;
+  
+      default:
+        break;
+    }
+  }
 }
 
-/*---------------------------------------------------------------------------------------------------------*/
-
-/**
- * @brief If a or attack command it makes a combat between
- * @param game Pointer to structure Game
- * @return OK or ERROR
- */
-void game_command_attack(Game *g)
-{
-  int dmg, player_hp, enemy_hp;
-  Id player_loc, enemy_loc;
-
-  if (!g)
-  {
-    g->cmd_st = ERROR;
-    return;
-  }
-  g->description[0] = '\0';
-
-  player_loc = player_getLocation(g->play);
-  enemy_loc = enemy_getLocation(g->enemy[0]);
-  player_hp = player_getHealth(g->play);
-  enemy_hp = enemy_getHealth(g->enemy[0]);
-
-  if (player_loc != enemy_loc || enemy_hp<=0 )
-  {
-    g->cmd_st = ERROR;
-    return;
-  }
-
-  dmg = (rand() % 10);
-
-  if (dmg <= 4)
-  {
-    if (dmg == 0)
-    {
-      player_hp -= 2;
-    }
-    else
-    {
-      player_hp--;
-    }
-    player_setHealth(g->play, player_hp);
-  }
-  else
-  {
-    if (dmg == 9)
-    {
-      enemy_hp -= 2;
-    }
-    else
-    {
-      enemy_hp--;
-    }
-    enemy_setHealth(g->enemy[0], enemy_hp);
-  }
-
-  if (enemy_hp <= 0)
-  {
-    enemy_setLocation(g->enemy[0], NO_ID);
-  }
-}
 
 /*----------------------------------------------------------------------------------------------------------*/
-
 /**
  * @brief If m or move command it makes the player move to the direction requested
  * @param game Pointer to structure Game
  */
-void game_command_move(Game *g)
-{
+void game_command_move(Game *g) {
   Id current_id = NO_ID;
   Id space_id = NO_ID, link_id = NO_ID, req = NO_ID, aux = NO_ID;
   long first_digit = 0;
@@ -1096,215 +840,257 @@ void game_command_move(Game *g)
   }
 
   scanf(" %c", &direction);
-/*NORTH*/
-  if (direction == 'n' || direction == 'N') {
+  /*UP*/
+  if (direction == 'u' || direction == 'U') {
 
-    link_id = space_get_north(game_get_space(g, space_id));
-    if (link_id != NO_ID) {
-      if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
-        aux = req = link_getRequirement(game_get_link(g, link_id));
-        while (aux != 0) {
-            first_digit = aux % 10;
-            aux /= 10;
-        }
-        if (first_digit == 2) {
-          if(player_hasObject(g->play, req) == TRUE) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+    if(player_isHere(g->play, 2, 1) == TRUE) {
+      link_id = space_get_north(game_get_space(g, space_id));
+      if (link_id != NO_ID) {
+        if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
+          aux = req = link_getRequirement(game_get_link(g, link_id));
+          while (aux != 0) {
+              first_digit = aux % 10;
+              aux /= 10;
           }
-          else { 
-            fprintf(stdout, "You need to have the object %s to open this door\n", object_get_name(game_get_object(g, req)));
-            g->cmd_st = ERROR;
-            return;
+          if (first_digit == 2) {
+            if(player_hasObject(g->play, req) == TRUE) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else { 
+              fprintf(stdout, "You need to have the object %s to open this door\n", object_get_name(game_get_object(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
-        }
-        else if(first_digit == 4) {
-          if(enemy_getHealth(game_get_enemy(g, req)) == 0) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+          else if(first_digit == 4) {
+            if(enemy_getHealth(game_get_enemy(g, req)) == 0) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else {
+              fprintf(stdout, "You need to kill the enemy %s to open this door\n", enemy_getName(game_get_enemy(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
           else {
-            fprintf(stdout, "You need to kill the enemy %s to open this door\n", enemy_getName(game_get_enemy(g, req)));
+            printf("Error 4");
             g->cmd_st = ERROR;
             return;
           }
         }
-        else {
-          printf("Error 4");
-          g->cmd_st = ERROR;
-          return;
+        if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
+          if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
+            printf("Error 5");
+            g->cmd_st = ERROR;
+            return;
+          }
+          else
+            player_setLocation(g->play, current_id);
+            player_setPositionI(g->play, 2);
         }
       }
-      if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
-        if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
-          printf("Error 5");
-          g->cmd_st = ERROR;
-          return;
-        }
-        else
-          player_setLocation(g->play, current_id);
+      else {
+        printf("Error 6");
+        g->cmd_st = ERROR;
+        return;
       }
+
     }
-    else {
-      printf("Error 6");
+    else if(player_getPositionI(g->play) == 0) {
       g->cmd_st = ERROR;
       return;
     }
+    else {
+      player_setPositionI(g->play, player_getPositionI(g->play) - 1);
+    }
   }
-  /*SOUTH*/
-  else if (direction == 's' || direction == 'S') {
-    link_id = space_get_south(game_get_space(g, space_id));
-    if (link_id != NO_ID) {
-      if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
-        aux = req = link_getRequirement(game_get_link(g, link_id));
-        while (aux != 0) {
-            first_digit = aux % 10;
-            aux /= 10;
-        }
-        if (first_digit == 2) {
-          if(player_hasObject(g->play, req) == TRUE) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+  /*DOWN*/
+  else if (direction == 'd' || direction == 'D') {
+    if(player_isHere(g->play, 2, 1)) {
+      link_id = space_get_south(game_get_space(g, space_id));
+      if (link_id != NO_ID) {
+        if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
+          aux = req = link_getRequirement(game_get_link(g, link_id));
+          while (aux != 0) {
+              first_digit = aux % 10;
+              aux /= 10;
           }
-          else { 
-            fprintf(stdout, "You need to have the object %s to open this door", object_get_name(game_get_object(g, req)));
-            g->cmd_st = ERROR;
-            return;
+          if (first_digit == 2) {
+            if(player_hasObject(g->play, req) == TRUE) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else { 
+              fprintf(stdout, "You need to have the object %s to open this door", object_get_name(game_get_object(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
-        }
-        else if(first_digit == 4) {
-          if(enemy_getHealth(game_get_enemy(g, req)) <= 0) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+          else if(first_digit == 4) {
+            if(enemy_getHealth(game_get_enemy(g, req)) <= 0) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else {
+              fprintf(stdout, "You need to kill the enemy %s to open this door", enemy_getName(game_get_enemy(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
           else {
-            fprintf(stdout, "You need to kill the enemy %s to open this door", enemy_getName(game_get_enemy(g, req)));
+            printf("Error 4");
             g->cmd_st = ERROR;
             return;
           }
         }
-        else {
-          printf("Error 4");
-          g->cmd_st = ERROR;
-          return;
+        if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
+          if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
+            printf("Error 5");
+            g->cmd_st = ERROR;
+            return;
+          }
+          else
+            player_setLocation(g->play, current_id);
+            player_setPositionI(g->play, 0);
         }
       }
-      if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
-        if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
-          printf("Error 5");
-          g->cmd_st = ERROR;
-          return;
-        }
-        else
-          player_setLocation(g->play, current_id);
+      else {
+        printf("Error 6");
+        g->cmd_st = ERROR;
+        return;
       }
     }
-    else {
-      printf("Error 6");
+    else if(player_getPositionI(g->play) == 2) {
       g->cmd_st = ERROR;
       return;
     }
+    else {
+      player_setPositionI(g->play, player_getPositionI(g->play) + 1);
+    }
   }
-  /*WEST*/
-  else if (direction == 'w' || direction == 'W') {
-    link_id = space_get_west(game_get_space(g, space_id));
-    if (link_id != NO_ID) {
-      if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
-        aux = req = link_getRequirement(game_get_link(g, link_id));
-        while (aux != 0) {
-            first_digit = aux % 10;
-            aux /= 10;
-        }
-        if (first_digit == 2) {
-          if(player_hasObject(g->play, req) == TRUE) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+  /*LEFT*/
+  else if (direction == 'l' || direction == 'L') {
+
+    if(player_isHere(g->play, 1, 0)) {
+      link_id = space_get_west(game_get_space(g, space_id));
+      if (link_id != NO_ID) {
+        if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
+          aux = req = link_getRequirement(game_get_link(g, link_id));
+          while (aux != 0) {
+              first_digit = aux % 10;
+              aux /= 10;
           }
-          else { 
-            fprintf(stdout, "You need to have the object %s to open this door", object_get_name(game_get_object(g, req)));
-            g->cmd_st = ERROR;
-            return;
+          if (first_digit == 2) {
+            if(player_hasObject(g->play, req) == TRUE) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else { 
+              fprintf(stdout, "You need to have the object %s to open this door", object_get_name(game_get_object(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
-        }
-        else if(first_digit == 4) {
-          if(enemy_getHealth(game_get_enemy(g, req)) <= 0) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+          else if(first_digit == 4) {
+            if(enemy_getHealth(game_get_enemy(g, req)) <= 0) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else {
+              fprintf(stdout, "You need to kill the enemy %s to open this door", enemy_getName(game_get_enemy(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
           else {
-            fprintf(stdout, "You need to kill the enemy %s to open this door", enemy_getName(game_get_enemy(g, req)));
+            printf("Error 7");
             g->cmd_st = ERROR;
             return;
           }
         }
-        else {
-          printf("Error 7");
-          g->cmd_st = ERROR;
-          return;
+        if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
+          if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
+            printf("Error 5");
+            g->cmd_st = ERROR;
+            return;
+          }
+          else
+            player_setLocation(g->play, current_id);
+            player_setPositionJ(g->play, 2);
         }
       }
-      if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
-        if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
-          printf("Error 5");
-          g->cmd_st = ERROR;
-          return;
-        }
-        else
-          player_setLocation(g->play, current_id);
+      else {
+        printf("Error 9");
+        g->cmd_st = ERROR;
+        return;
       }
     }
-    else {
-      printf("Error 9");
+    else if(player_getPositionJ(g->play) == 0) {
       g->cmd_st = ERROR;
       return;
     }
+    else {
+      player_setPositionJ(g->play, player_getPositionJ(g->play) - 1);
+    }
   }
-  /*EAST*/
-  else if (direction == 'e' || direction == 'E') {
-    link_id = space_get_east(game_get_space(g, space_id));
-    if (link_id != NO_ID) {
-      if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
-        aux = req = link_getRequirement(game_get_link(g, link_id));
-        while (aux != 0) {
-            first_digit = aux % 10;
-            aux /= 10;
-        }
-        if (first_digit == 2) {
-          if(player_hasObject(g->play, req) == TRUE) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+  /*RIGHT*/
+  else if (direction == 'r' || direction == 'R') {
+    if(player_isHere(g->play, 1, 2))  {
+      link_id = space_get_east(game_get_space(g, space_id));
+      if (link_id != NO_ID) {
+        if(link_getOpen(game_get_link(g, link_id)) == FALSE) {
+          aux = req = link_getRequirement(game_get_link(g, link_id));
+          while (aux != 0) {
+              first_digit = aux % 10;
+              aux /= 10;
           }
-          else { 
-            fprintf(stdout, "You need to have the object %s to open this door", object_get_name(game_get_object(g, req)));
-            g->cmd_st = ERROR;
-            return;
+          if (first_digit == 2) {
+            if(player_hasObject(g->play, req) == TRUE) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else { 
+              fprintf(stdout, "You need to have the object %s to open this door", object_get_name(game_get_object(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
-        }
-        else if(first_digit == 4) {
-          if(enemy_getHealth(game_get_enemy(g, req)) <= 0) {
-            link_setOpen(game_get_link(g, link_id), TRUE);
+          else if(first_digit == 4) {
+            if(enemy_getHealth(game_get_enemy(g, req)) <= 0) {
+              link_setOpen(game_get_link(g, link_id), TRUE);
+            }
+            else {
+              fprintf(stdout, "You need to kill the enemy %s to open this door", enemy_getName(game_get_enemy(g, req)));
+              g->cmd_st = ERROR;
+              return;
+            }
           }
           else {
-            fprintf(stdout, "You need to kill the enemy %s to open this door", enemy_getName(game_get_enemy(g, req)));
+            printf("Error 10");
             g->cmd_st = ERROR;
             return;
           }
         }
-        else {
-          printf("Error 10");
-          g->cmd_st = ERROR;
-          return;
+        if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
+          if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
+            printf("Error 5");
+            g->cmd_st = ERROR;
+            return;
+          }
+          else
+            player_setLocation(g->play, current_id);
         }
       }
-      if(link_getOpen(game_get_link(g, link_id)) == TRUE) {
-        if((current_id = link_getDestination(game_get_link(g, link_id))) == NO_ID) {
-          printf("Error 5");
-          g->cmd_st = ERROR;
-          return;
-        }
-        else
-          player_setLocation(g->play, current_id);
+      else {
+        printf("Error 12");
+        g->cmd_st = ERROR;
+        return;
       }
     }
-    else {
-      printf("Error 12");
+    else if(player_getPositionJ(g->play) == 2) {
       g->cmd_st = ERROR;
       return;
     }
+    else {
+      player_setPositionJ(g->play, player_getPositionJ(g->play) + 1);
+    }
   }
+
   g->description[0] = '\0';
 }
 
@@ -1316,6 +1102,9 @@ void game_command_move(Game *g)
 void game_command_inspect(Game *g) {
   Id object_id = NO_ID, p_loc = NO_ID;
   char name[WORD_SIZE + 1];
+  char aux[WORD_SIZE + 1];
+  BDTYPE buff_type = NO_TYPE, nerf_type = NO_TYPE;
+  Object *object = NULL;
    if (g == NULL)
   {
     g->cmd_st = ERROR;
@@ -1330,23 +1119,354 @@ void game_command_inspect(Game *g) {
       g->cmd_st = ERROR;
       return;
     }
-  if (strcmp(name, "s")==0||strcmp(name,"space")==0) {
-    strcpy(g->description, space_get_desc(game_get_space(g, p_loc)));
+  
+  object_id = _game_getObjectId_fromName(g, name);
+  if(object_id == NO_ID) {
+    g->cmd_st = ERROR;
+    return;
   }
-  else 
+
+  object = game_get_object(g, object_id);
+  if(object == NULL) {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  if ((object_isHere(object, player_getPositionI(g->play), player_getPositionJ(g->play)) == FALSE) && (player_hasObject(g->play, object_id) == FALSE))
   {
-    object_id = _game_getObjectId_fromName(g, name);
-    if(object_id == NO_ID) {
-      g->cmd_st = ERROR;
-      return;
-    }
+    g->cmd_st = ERROR;
+    return;
+  }
+  
+  strcpy(g->description, "You inspect the object %s:");
+   buff_type = bd_getType(object_getBuff(object));
+  nerf_type = bd_getType(object_getDebuff(object));
 
-    if ((game_get_object_location(g, object_id) != p_loc) && (player_hasObject(g->play, object_id) == FALSE))
-    {
-      g->cmd_st = ERROR;
-      return;
-    }
+  switch (buff_type) {
+    case ATT:
+      sprintf(aux, WORD_SIZE," ATTACK +%.1f ", bd_getValue(object_getBuff(object)));
+      break;
 
-    strcpy(g->description, object_get_desc(game_get_object(g, object_id)));
+    case DEF:
+      sprintf(aux, WORD_SIZE," DEFENSE +%.1f ", bd_getValue(object_getBuff(object)));
+      break;
+
+    case HP:
+      sprintf(aux, WORD_SIZE," HEALTH +%.1f ", bd_getValue(object_getBuff(object)));
+      break;
+
+    default:
+      break;
+  }
+  
+  switch (nerf_type) {
+    case ATT:
+      sprintf(aux, WORD_SIZE," ATTACK -%.1f ", bd_getValue(object_getDebuff(object)));
+      break;
+
+    case DEF:
+      sprintf(aux, WORD_SIZE," DEFENSE -%.1f ", bd_getValue(object_getDebuff(object)));
+      break;
+
+    case HP:
+      sprintf(aux, WORD_SIZE," HEALTH -%.1f ", bd_getValue(object_getDebuff(object)));
+      break;
+
+    default:
+      break;
+  }
+
+  strcat(g->description, aux);
+
+  if(object_getIfConsumable(object) == TRUE) {
+    strcat(g->description, "It is consumable");
+  }
+  else {
+    strcat(g->description, "It is not consumable");
   }
 }
+
+/*----------------------------------------------------------------------------------------------------------*/
+/**
+ * @brief If c or combat command it takes wether u would like to attack or protect from an enemy
+ * @param game Pointer to structure Game
+ */
+void game_command_combat(Game *g) {
+  char action[WORD_SIZE +1];
+  int i = 0, prob;
+  float dmg = 0;
+  Enemy *enemy = NULL;
+  Id enemy_id = NO_ID;
+  if (g == NULL) {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  scanf(" %s", action);
+
+  if (action[0] == '\0') {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  enemy = _game_get_enemy_fromPlayer_location(g);
+  if(enemy == NULL) {
+    g->cmd_st = ERROR;
+    return;
+  }
+  enemy_id = enemy_getId(enemy);
+  
+  if((enemy_id == 41) || (enemy_id == 42) || (enemy_id == 43)) {
+    if((strcmp(action, "attack") == 0) || (strcmp(action, "Attack") == 0) || (strcmp(action, "a") == 0) || (strcmp(action, "A") == 0)) {
+      if((prob = rand() % 15) <= 1) {
+        g->attack_failed = TRUE;
+      }
+      else {
+        dmg = player_getAttack(g->play) - enemy_getDefense(enemy);
+        if(dmg < 0) {
+          dmg = 0;
+        }
+
+        if(prob == 15) {
+          g->attack_critical = TRUE;
+          dmg = dmg * 2;
+        }
+
+        enemy_setHealth(enemy, enemy_getHealth(enemy) - dmg);
+        if(enemy_getHealth(enemy) <= 0) {
+          enemy_setLocation(enemy, DEAD);
+        }
+      }
+      if(prob <= 4) {
+        dmg = enemy_getAttack(enemy) - player_getDefense(g->play);
+        if(dmg < 0) {
+          dmg = 0;
+        }
+
+        if(prob == 0) {
+          dmg = dmg * 2;
+        }
+
+        player_setHealth(g->play, player_getHealth(g->play) - dmg);
+        if(player_getHealth(g->play) <= 0) {
+          player_setLocation(g->play, DEAD);
+        }
+      }
+      else if(prob <= 8) {
+        g->nerf_round = g->rounds + 2;
+        player_setDefense(g->play, player_getDefense(g->play) - 5);
+      }
+    }
+    if((strcmp(action, "protect") == 0) || (strcmp(action, "Protect") == 0) || (strcmp(action, "p") == 0) || (strcmp(action, "P") == 0)) {
+      if((prob = rand() % 15) == 0) {
+        g->attack_failed = TRUE;
+      }
+      else {
+        dmg = enemy_getAttack(enemy) - (player_getDefense(g->play) + 7);
+        if(dmg < 0) {
+          dmg = 0;
+        }
+        player_setHealth(g->play, player_getHealth(g->play) - dmg);
+        if(player_getHealth(g->play) <= 0) {
+          player_setLocation(g->play, DEAD);
+        }
+      }
+    }
+    else {
+      g->cmd_st = ERROR;
+      return;
+    }
+  }
+  else {
+    if(enemy_isHere(enemy, player_getPositionI(g->play), player_getPositionJ(g->play)) == FALSE) {
+      g->cmd_st = ERROR;
+      return;
+    }
+
+    if((strcmp(action, "attack") == 0) || (strcmp(action, "Attack") == 0) || (strcmp(action, "a") == 0) || (strcmp(action, "A") == 0)) {
+      if((prob = rand() % 15) <= 1) {
+        g->attack_failed = TRUE;
+      }
+      else {
+        dmg = player_getAttack(g->play) - enemy_getDefense(enemy);
+        if(dmg < 0) {
+          dmg = 0;
+        }
+
+        if(prob == 15) {
+          g->attack_critical = TRUE;
+          dmg = dmg * 2;
+        }
+
+        enemy_setHealth(enemy, enemy_getHealth(enemy) - dmg);
+        if(enemy_getHealth(enemy) <= 0) {
+          enemy_setLocation(enemy, DEAD);
+        }
+      }
+      if(prob <= 9) {
+        dmg = enemy_getAttack(enemy) - player_getDefense(g->play);
+        if(dmg < 0) {
+          dmg = 0;
+        }
+
+        if(prob == 0) {
+          dmg = dmg * 2;
+        }
+
+        player_setHealth(g->play, player_getHealth(g->play) - dmg);
+        if(player_getHealth(g->play) <= 0) {
+          player_setLocation(g->play, DEAD);
+        }
+      }
+    }
+    if((strcmp(action, "protect") == 0) || (strcmp(action, "Protect") == 0) || (strcmp(action, "p") == 0) || (strcmp(action, "P") == 0)) {
+      if((prob = rand() % 15) == 0) {
+        g->attack_failed = TRUE;
+      }
+      else {
+        dmg = enemy_getAttack(enemy) - (3*player_getDefense(g->play));
+        if(dmg < 0) {
+          dmg = 0;
+        }
+        player_setHealth(g->play, player_getHealth(g->play) - dmg);
+        if(player_getHealth(g->play) <= 0) {
+          player_setLocation(g->play, DEAD);
+        }
+      }
+    }
+    else {
+      g->cmd_st = ERROR;
+      return;
+    }
+  }
+}
+
+/*----------------------------------------------------------------------------------------------------------*/
+/**
+ * @brief If u or use command it uses an object that the player has in the inventory
+ * @param game Pointer to structure Game
+ */
+void game_command_use(Game *g) {
+  Id space_id, object_id = NO_ID;
+  char object_name[WORD_SIZE + 1];
+  BDTYPE buff_type = NO_TYPE, nerf_type = NO_TYPE;
+  Object *object = NULL;
+  if (!g)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+  g->description[0] = '\0';
+
+  scanf(" %s", object_name);
+  space_id = game_get_player_location(g);
+  if (object_name[0] == '\0')
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  object_id = _game_getObjectId_fromName(g, object_name);
+  if(object_id == NO_ID) {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  object = game_get_object(g, object_id);
+  if (object == NULL)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  if (player_hasObject(g->play, object_id) == FALSE)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+
+  player_deleteObject(g->play, object_id);
+
+  buff_type = bd_getType(object_getBuff(object));
+  nerf_type = bd_getType(object_getDebuff(object));
+
+  if(object_getIfConsumable(object) == TRUE) {
+    switch (buff_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+  
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+  
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) + bd_getValue(object_getBuff(object)));
+        break;
+  
+      default:
+        break;
+    }
+    
+    switch (nerf_type) {
+      case ATT:
+        player_setAttack(g->play, player_getAttack(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+  
+      case DEF:
+        player_setDefense(g->play, player_getDefense(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+  
+      case HP:
+        player_setHealth(g->play, player_getHealth(g->play) + bd_getValue(object_getDebuff(object)));
+        break;
+  
+      default:
+        break;
+    }
+  }
+  else {
+    g->cmd_st = ERROR;
+    return;
+  }
+}
+
+/*----------------------------------------------------------------------------------------------------------*/
+/**
+ * @brief It activates the admin mode with the correct admin password:
+ * Admin <admin password> <YES/NO>
+ * @param game Pointer to structure Game
+ */
+ void game_command_admin(Game *g) {
+  char password[WORD_SIZE + 1], toggle[WORD_SIZE + 1];
+
+  if (!g)
+  {
+    g->cmd_st = ERROR;
+    return;
+  }
+  scanf("%s", password);
+  if(strcmp(password, "Cumsitarios") == 0) {
+    scanf("%s", toggle);
+    if(strcmp(password, "YES") == 0) {
+      player_setHealth(g->play, 1000);
+      player_setAttack(g->play, 1000);
+      player_setDefense(g->play, 1000);
+      player_setXP(g->play, 1000);
+    }
+    else if(strcmp(password, "NO") == 0) {
+      player_setHealth(g->play, 25);
+      player_setAttack(g->play, 1);
+      player_setDefense(g->play, 0);
+      player_setXP(g->play, 0);
+    }
+    else {
+      g->cmd_st = ERROR;
+      return;
+    }
+  }
+  else {
+    g->cmd_st = ERROR;
+    return;
+  }
+ }

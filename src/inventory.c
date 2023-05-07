@@ -170,6 +170,15 @@ STATUS inventory_setCapacity(Inventory *inv, int capacity){
 
    return OK;
 }
+
+/*----------------------------------------------------------------------------------------------------*/
+Set* inventory_getSet(Inventory *inv){
+   if(!inv)
+      return NULL;
+   
+   return inv->objs;
+}
+
 /*----------------------------------------------------------------------------------------------------*/
 int inventory_print(FILE *pf, Inventory *inv){
    int n = 0;
