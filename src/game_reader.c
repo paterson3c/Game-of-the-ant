@@ -37,15 +37,45 @@ STATUS game_create_from_file(Game *game, char *filename)
 
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
+#include "game_reader.h"
+
+STATUS game_create_from_file(Game *game, char *filename) {
+  if (game_create(game) == ERROR) {
+    return ERROR;
+  }
+
+  if (game_load_spaces(game, filename) == ERROR) {
+    return ERROR;
+  }
+
+  if(game_load_objects(game, filename) == ERROR) {
+    return ERROR;
+  }
+
+  if (game_load_player(game, filename) == ERROR) {
+    return ERROR;
+  }
+
+  if(game_load_enemy(game, filename) == ERROR) {
+    return ERROR;
+  }
+
+  if(game_load_links(game, filename) == ERROR) {
+    return ERROR;
+  }
+  
+  return OK;
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
 STATUS game_load_spaces(Game *game, char *filename)
 {
   FILE *file = NULL;
   char line[WORD_SIZE] = "";
   char name[WORD_SIZE] = "";
-  char desc[WORD_SIZE] = "";
   char *toks = NULL;
   int nlines = 0;
-  int i = 0;
   Id id = NO_ID;
   Space *space = NULL;
   STATUS status = OK;
@@ -70,8 +100,6 @@ STATUS game_load_spaces(Game *game, char *filename)
       toks = strtok(NULL, "|");
       strcpy(name, toks);
       toks = strtok(NULL, "|");
-      strcpy(desc, toks);
-      toks = strtok(NULL, "|");
       nlines = atoi(toks);
 
 #ifdef DEBUG
@@ -81,15 +109,15 @@ STATUS game_load_spaces(Game *game, char *filename)
       if (space != NULL)
       {
         space_set_name(space, name);
-        space_set_desc(space, desc);
+        space_set_desc(space, name);
         space_set_nlines(space, nlines);
-        game_add_space(game, space);
-
         for (int i = 0; i < nlines; i++)
-        {
+        {  
           fgets(line, WORD_SIZE, file);
+          line[strlen(line)-1] = '\0';
           space_set_gdesc(space, line, i);
         }
+        game_add_space(game, space);
       }
     }
   }
